@@ -7,6 +7,11 @@ client send message with socketFd instead of connectFd
 ### 开发日记
 
 
+2024-05-12
+将logger配置到了gtest里面，计划明天把logger改成一个子cmake目录。
+
+
+2024-05-10
 项目打算通过CMake编译，加了cmake后一直还没编译成功，今天看是本地编译环境没有安装好cmake,以及vscode没有配置好插件。
 
 CMakeLists.txt拼错了，漏了s

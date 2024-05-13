@@ -8,6 +8,11 @@ client send message with socketFd instead of connectFd
 
 
 2024-05-12
+搜到这篇文章学习了一下，cmake项目目录结构的建议[How to structure your project](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
+把logger放到了子目录下
+
+
+2024-05-11
 将logger配置到了gtest里面，计划明天把logger改成一个子cmake目录。
 
 

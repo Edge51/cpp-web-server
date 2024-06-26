@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
 	sockaddr_in servAddr;
 	servAddr.sin_family = AF_INET;
-	servAddr.sin_port = PORT;
+	servAddr.sin_port = htons(PORT);
 	
 	int ret = inet_pton(AF_INET, "127.0.0.1", &servAddr.sin_addr);
 	if (ret	!= 1) {

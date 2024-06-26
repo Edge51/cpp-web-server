@@ -7,6 +7,8 @@ client send message with socketFd instead of connectFd
 ### 开发日记
 
 
+2024-06-27
+将最初的server.cpp调试成功了，之前一直server.cpp运行之后，client.cpp可以收发成功，但是浏览器无法访问，报错connection refused，最后google发现有人遇到相似问题，是端口号绑定时需要用htons转换成网络序
 2024-05-12
 搜到这篇文章学习了一下，cmake项目目录结构的建议[How to structure your project](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
 把logger放到了子目录下

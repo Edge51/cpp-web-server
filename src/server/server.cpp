@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+
 #define PORT 8888
 
 int main(int argc, char* argv[])
@@ -25,26 +26,29 @@ int main(int argc, char* argv[])
 	struct sockaddr_in  address;
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
-	address.sin_port = PORT;
+	address.sin_port = htons(PORT);
 
 	int ret = bind(socketFd, reinterpret_cast<sockaddr *>(&address), sizeof(address));
 	if (ret < 0) {
 		printf("bind failed");
 		return 1;
 	}
+	printf("socket binded on port 8888\n");
 
 	ret = listen(socketFd, 6);
 	if (ret < 0) {
 		printf("listen socketFd failed.\n");
 		return 1;
 	}
+	printf("listening on socketFd:%d\n", socketFd);
 
 	socklen_t addressSize = sizeof(address);
 	int acceptFd = accept(socketFd, reinterpret_cast<sockaddr*>(&address), &addressSize);
 	if (ret < 0) {
-		printf("accpet failed");
+		printf("accpet failed\n");
 		return 1;
 	}
+	printf("accept connection!!\n");
 
 	char buf[1024] = { 0 };
 	while (true) {

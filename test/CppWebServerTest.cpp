@@ -1,11 +1,18 @@
-
 #include <gtest/gtest.h>
+#include <thread>
 
 #include "CppWebServerTest.h"
 #include "logger.h"
+#include "Server.h"
+#include "Client.h"
 
-TEST(CppWebServerTest, Initialize)
+
+TEST(CppWebServerTest, ServerRun)
 {
-    EXPECT_EQ(hello(), 1);
-    EXPECT_NE(hello(), 0);
+    std::thread serverThread(ServerRun);
+    serverThread.detach();
+    sleep(3);
+    EXPECT_EQ(ClientRequest(), "Hello from Server!\n");
+    EXPECT_NE(ClientRequest(), "Hello from Server1!\n");
+    EXPECT_EQ(ClientRequest(), "Hello from Server!\n");
 }

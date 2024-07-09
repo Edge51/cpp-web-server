@@ -8,14 +8,17 @@
 #include <errno.h>
 #define PORT 8888
 
-int main(int argc, char* argv[])
+
+#include "Client.h"
+
+std::string ClientRequest()
 {
-	printf("Client start.\n");
+    printf("Client start.\n");
 
 	int socketFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socketFd < 0) {
 		printf("socket failed\n");
-		return -1;
+		return "";
 	}
 
 	sockaddr_in servAddr;
@@ -25,13 +28,13 @@ int main(int argc, char* argv[])
 	int ret = inet_pton(AF_INET, "127.0.0.1", &servAddr.sin_addr);
 	if (ret	!= 1) {
 		printf("inet_pton failed, with error code:%d\n", ret);
-		return -1;
+		return "";
 	}
 
 	ret = connect(socketFd, reinterpret_cast<sockaddr *>(&servAddr), sizeof(servAddr));
 	if (ret < 0) {
 		printf("connect failed:%s\n", strerror(errno));
-		return -1;
+		return "";
 	}
 
 	printf("Before Client send...\n");
@@ -47,5 +50,5 @@ int main(int argc, char* argv[])
 
 	close(socketFd);
 
-	return 0;
+	return buffer;
 }

@@ -7,6 +7,11 @@ client send message with socketFd instead of connectFd
 ### 开发日记
 
 
+2024-07-10
+今天把原来的Client.cpp和Server.cpp做了一点简单的重构，把main函数的流程直接整个搬出来一个函数，方便gtest用例调用，这样就有测试用例去保障重构不出错了，下一步就是把原来的过程式代码重构成几个类，把socket封装成类，而不是用原生的socket去写过程式的代码。
+有几个点后续需要搞懂，测试用例里面，为什么thread.detach才能正常运行，socket需要读manual学习
+测试用例依赖了源文件，不知道这样是否符合测试用例的原则
+
 2024-06-27
 将最初的server.cpp调试成功了，之前一直server.cpp运行之后，client.cpp可以收发成功，但是浏览器无法访问，报错connection refused，最后google发现有人遇到相似问题，是端口号绑定时需要用htons转换成网络序
 2024-05-12

@@ -1,14 +1,15 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(CppWebServer)
 
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(Logger Logger)
 
-add_executable(CppWebServer src/server/server.cpp)
+add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp)
 
 target_include_directories(CppWebServer PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/include)
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server)
 
 
 include(FetchContent)
@@ -23,10 +24,12 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-add_executable(CppWebServerTest test/CppWebServerTest.cpp Logger/src/logger.cpp)
+add_executable(CppWebServerTest test/CppWebServerTest.cpp Logger/src/logger.cpp src/server/Server.cpp src/client/Client.cpp)
 target_link_libraries(CppWebServerTest GTest::gtest_main)
 target_include_directories(CppWebServerTest PRIVATE
     Logger/include
+    src/server
+    src/client
     test)
 
 include(GoogleTest)

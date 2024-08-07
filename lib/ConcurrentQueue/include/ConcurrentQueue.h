@@ -68,7 +68,7 @@ T ConcurrentQueue<T>::Top()
 template <typename T>
 void ConcurrentQueue<T>::Pop()
 {
-    // Should I throw an exception here?
+    // TODO Should I throw an exception here?
     if (m_size <= 0) {
         return ;
     }

@@ -6,7 +6,13 @@ client send message with socketFd instead of connectFd
 
 ### 开发日记
 
-2024-08-01
+2024-08-07
+Don't rush. Don't always think I should finish the task today or something like this. Just focus on what you are doing.
+Came across this error:
+```
+terminate called without an active exception
+```
+reason: program terminated without joining or detaching all thread.
 
 
 2024-07-31

@@ -18,8 +18,8 @@ public:
     void Push(T item);
     void Pop();
     T Top();
-    bool Empty() const;
-    uint32_t Size() const;
+    bool Empty();
+    uint32_t Size();
 
 private:
     struct Node {
@@ -46,6 +46,7 @@ ConcurrentQueue<T>::ConcurrentQueue()
 template <typename T>
 void ConcurrentQueue<T>::Push(T item)
 {
+    std::lock_guard guard(m_headMutex);
     std::shared_ptr<T> data = std::make_shared<T>(std::move(item));
     std::unique_ptr<Node> newNode = std::make_unique<Node>(nullptr, nullptr);
     m_tail->data = data;
@@ -58,8 +59,9 @@ void ConcurrentQueue<T>::Push(T item)
 template <typename T>
 T ConcurrentQueue<T>::Top()
 {
+    std::lock_guard guard(m_headMutex);
     if (m_size <= 0) {
-        std::cout << "m_size:%u <= -1" << std::endl;
+        std::cerr << "m_size:%u <= -1" << std::endl;
         return T();
     }
     return *(m_head->data);
@@ -69,6 +71,7 @@ template <typename T>
 void ConcurrentQueue<T>::Pop()
 {
     // TODO Should I throw an exception here?
+    std::lock_guard guard(m_headMutex);
     if (m_size <= 0) {
         return ;
     }
@@ -77,14 +80,16 @@ void ConcurrentQueue<T>::Pop()
 }
 
 template <typename T>
-bool ConcurrentQueue<T>::Empty() const
+bool ConcurrentQueue<T>::Empty()
 {
+    std::lock_guard guard(m_headMutex);
     return m_size <= 0;
 }
 
 template <typename T>
-uint32_t ConcurrentQueue<T>::Size() const
+uint32_t ConcurrentQueue<T>::Size()
 {
+    std::lock_guard guard(m_headMutex);
     return m_size;
 }
 #endif

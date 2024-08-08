@@ -6,6 +6,23 @@ client send message with socketFd instead of connectFd
 
 ### 开发日记
 
+2024-08-08
+Didn't get it at first why unit test failed. But I print the log and get it right finally. It turns out that there is some mistake in the unit test, look at the code below:
+``` C++
+std::map<int, int> items;
+std::vector<std::thread> consumerList;
+std::vector<int> popingLog;
+for (int i =  0; i < consumerNum; i++) {
+    consumerList.emplace_back([&] (ConcurrentQueue<int>& queue, std::map<int, int>& items) {
+        for (int j  = 0; j < producerNum * 2 / consumerNum; j++) {
+            int top = queue.Top();  // top is read and the mutex is released
+            items[top]++; // in between Top() and Pop(), maybe some other thread read top and add top in items
+            queue.Pop(); // maybe not poping top
+        }
+    }, std::ref(queue), std::ref(items));
+}
+```
+
 2024-08-07
 Don't rush. Don't always think I should finish the task today or something like this. Just focus on what you are doing.
 Came across this error:

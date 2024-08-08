@@ -2,6 +2,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <sstream>
 #include "ConcurrentQueue.h"
 
 TEST(ConcurrentQueueTest, PushAndPop)
@@ -25,29 +26,43 @@ TEST(ConcurrentQueueTest, PushAndPop)
     EXPECT_TRUE(queue.Empty());
 }
 
+std::mutex g_popMutex;
 TEST(ConcurrentQueueTest, MultiThread)
 {
     ConcurrentQueue<int> queue;
     std::vector<std::thread> producerList;
-    for (int i = 0; i < 400; i++) {
-        producerList.emplace_back(([](ConcurrentQueue<int>& queue, int i) {
+    const uint32_t producerNum = 400;
+    const uint32_t consumerNum = 80;
+
+    std::vector<int> pushingLog;
+    for (int i = 0; i < producerNum; i++) {
+        producerList.emplace_back(([&](ConcurrentQueue<int>& queue, int i) {
             queue.Push(i);
-            queue.Push(i + 400);
+            GTEST_LOG_(INFO) << "pushing:" << i;
+            pushingLog.push_back(i);
+            queue.Push(i + producerNum);
+            GTEST_LOG_(INFO) << "pushing:" << i + producerNum;
+            pushingLog.push_back(i + producerNum);
         }), std::ref(queue), i);
     }
-    EXPECT_EQ(producerList.size(), 400);
+    EXPECT_EQ(producerList.size(), producerNum);
 
     std::map<int, int> items;
     std::vector<std::thread> consumerList;
-    for (int i =  0; i < 4; i++) {
-        consumerList.emplace_back([] (ConcurrentQueue<int>& queue, std::map<int, int>& items) {
-            for (int j  = 0; j < 400; j++) {
-                items[queue.Top()]++;
+    std::vector<int> popingLog;
+    for (int i =  0; i < consumerNum; i++) {
+        consumerList.emplace_back([&] (ConcurrentQueue<int>& queue, std::map<int, int>& items) {
+            for (int j  = 0; j < producerNum * 2 / consumerNum; j++) {
+                std::lock_guard guard(g_popMutex);
+                int top = queue.Top();
+                items[top]++;
+                GTEST_LOG_(INFO) << "poping:" << queue.Top();
+                popingLog.push_back(top);
                 queue.Pop();
             }
         }, std::ref(queue), std::ref(items));
     }
-    EXPECT_EQ(consumerList.size(), 4);
+    EXPECT_EQ(consumerList.size(), consumerNum);
 
     for (auto& producer : producerList) {
         producer.join();
@@ -58,9 +73,24 @@ TEST(ConcurrentQueueTest, MultiThread)
     // for (int i = 0; i < 800; i++) {
     //     EXPECT_EQ(items[i], 1);
     // }
-    // TODO Too many print in UT result if it fails.
-    EXPECT_EQ(items.size(), 800);
-    for (const auto& item : items) {
-        GTEST_LOG_(INFO) << "item key:" << item.first << ", value:" << item.second;
+    std::stringstream pushingSstream;
+    for (const auto& log : pushingLog) {
+        pushingSstream << log << " ";
     }
+    char product[256];
+    pushingSstream.getline(product, 256);
+    GTEST_LOG_(INFO) << "pushingLog:" << product;
+
+    std::stringstream popingSstream;
+    for (const auto& log : popingLog) {
+        popingSstream << log << " ";
+    }
+    char consume[256];
+    popingSstream.getline(consume, 256);
+    GTEST_LOG_(INFO) << "popingLog:" << consume;
+    // TODO Too many print in UT result if it fails.
+    EXPECT_EQ(items.size(), producerNum * 2);
+    // for (const auto& item : items) {
+    //     GTEST_LOG_(INFO) << "item key:" << item.first << ", value:" << item.second;
+    // }
 }

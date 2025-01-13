@@ -6,6 +6,43 @@ client send message with socketFd instead of connectFd
 
 ### 开发日记
 
+2024-08-26
+because the concurrent test throws exception, seems like the pop should be change to try pop and wait and pop.
+
+2024-08-15
+fix BUG20240815001 and start a BUG record.
+- map iterator returns pair
+```
+    EXPECT_TRUE([&]()-> bool{
+        return std::all_of(items.begin(), items.end(), [](std::pair<int, int> item){
+            return item.second == 1;
+        });
+    });
+```
+generating compile error:
+```
+[build] /home/Edge51/Projects/cpp-web-server/build/_deps/googletest-src/googletest/include/gtest/gtest-assertion-result.h:161:9: 错误：cannot convert ‘const ConcurrentQueueTest_MultiThread_Test::TestBody()::<lambda()>’ to ‘bool’ in initialization
+[build]   161 |       : success_(success) {}
+[build]       |         ^~~~~~~~~~~~~~~~~
+[build] make[3]: *** [lib/ConcurrentQueue/CMakeFiles/ConcurrentQueueTest.dir/build.make:76：lib/ConcurrentQueue/CMakeFiles/ConcurrentQueueTest.dir/test/ConcurrentQueueTest.cpp.o] 错误 1
+```
+
+2024-08-14
+Continue to finish this concurrent queue, with reading *C++ concurrency in Action*, I learn about that generally the concurrent version of queue don't implement Top and Pop seperately. If the queue have both Top and Pop interfacec provided to user, the user probably will get into race condition without care. So first thing I need do in order to improve the queue is to redefine the interfaces of the queue and then modify to make the test pass.
+ 
+things to figure out:
+- exception defining
+- smart pointer
+- 
+
+exception define by inherit the std::exception interface:
+``` cpp
+class EmptyQueue : std::exception {
+public:
+    const char* what() const throw() { return "Empty Queue!";};
+};
+```
+
 2024-08-08
 Didn't get it at first why unit test failed. But I print the log and get it right finally. It turns out that there is some mistake in the unit test, look at the code below:
 ``` C++

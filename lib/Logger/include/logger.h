@@ -3,8 +3,6 @@
 
 #include <string>
 
-int hello();
-
 enum class LogLevel {
     DEBUG,
     INFO,

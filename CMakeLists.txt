@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib lib)
 
-add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp)
+add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
+        src/server/Logger.cpp
+        src/server/Logger.h)
 
 target_include_directories(CppWebServer PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include

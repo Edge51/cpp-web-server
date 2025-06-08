@@ -2,7 +2,6 @@
 #include <thread>
 
 #include "CppWebServerTest.h"
-#include "logger.h"
 #include "Server.h"
 #include "Client.h"
 

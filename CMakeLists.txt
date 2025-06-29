@@ -7,7 +7,11 @@ add_subdirectory(lib lib)
 
 add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
         src/server/Logger.cpp
-        src/server/Logger.h)
+        src/server/InetAddress.cpp
+        src/server/Epoll.cpp
+        src/server/Socket.cpp
+        src/server/Define.h
+)
 
 target_include_directories(CppWebServer PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
@@ -26,7 +30,14 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-add_executable(CppWebServerTest test/CppWebServerTest.cpp lib/Logger/src/logger.cpp src/server/Server.cpp src/client/Client.cpp)
+add_executable(CppWebServerTest
+        test/CppWebServerTest.cpp
+        lib/Logger/src/logger.cpp
+        src/server/Epoll.cpp
+        src/server/Socket.cpp
+        src/server/InetAddress.cpp
+        src/server/Server.cpp
+        src/client/Client.cpp)
 target_link_libraries(CppWebServerTest GTest::gtest_main)
 target_include_directories(CppWebServerTest PRIVATE
     Logger/include

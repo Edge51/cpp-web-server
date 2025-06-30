@@ -10,6 +10,10 @@
 #include <string>
 
 #include "Server.h"
+
+#include <arpa/inet.h>
+
+#include "Channel.h"
 #include "Logger.h"
 #include "Epoll.h"
 #include "Socket.h"
@@ -20,18 +24,19 @@ constexpr int MAX_EVENTS = 10;
 
 
 
-void HandleInEvent(epoll_event activeEvent) {
+void HandleInEvent(int fd) {
+	LOG("HandleInEvent fd[%d]\n", fd);
 	char buf[1024] = { 0 };
 	int times = 0;
 	while (true) {
 		bzero(buf, sizeof(buf));
-		int bytesRead = read(activeEvent.data.fd, buf, sizeof(buf));
+		int bytesRead = read(fd, buf, sizeof(buf));
 		if (bytesRead > 0) {
 			times++;
 			LOG("read %d bytes from socket, buf:%s\n", bytesRead, buf);
 
 			char sendBuf[1024] = "Hello from Server!\n";
-			send(activeEvent.data.fd, sendBuf, strlen(sendBuf), 0);
+			send(fd, sendBuf, strlen(sendBuf), 0);
 			if (times == 3) {
 				LOG("receive end\n");
 				return ;
@@ -44,7 +49,7 @@ void HandleInEvent(epoll_event activeEvent) {
 			break;
 		} else if (bytesRead == 0) {
 			LOG("bytesRead[%d], client disconnected\n", bytesRead);
-			close(activeEvent.data.fd);
+			close(fd);
 			break;
 		}
 	}
@@ -52,29 +57,42 @@ void HandleInEvent(epoll_event activeEvent) {
 
 int32_t ServerRun()
 {
-    LOG("Server start.\n");
-	Socket socket;
-	socket.SetOpt(SO_REUSEADDR | SO_REUSEPORT);
+	LOG("ServerRun\n");
+	auto socket = std::make_shared<Socket>();
+	LOG("Socket created, fd[%d]\n", socket->GetFd());
+	socket->SetOpt(SO_REUSEADDR | SO_REUSEPORT);
 
-	InetAddress address("127.0.0.1", 8888);
-	socket.Bind(address);
-	socket.Listen();
+	auto address = std::make_shared<InetAddress>("127.0.0.1", 8888);
+	CHK_PRT(socket->Bind(address) == 0, "Bind failed");
+	socket->Listen();
+	socket->SetNonBlocking();
 
-	Epoll epoll;
-	epoll.AddFd(socket.GetFd(), EPOLLIN | EPOLLET);
+	auto epoll = std::make_shared<Epoll>();
+	LOG("epoll[%d] created.\n", epoll->GetFd());
 
+	auto channelPtr = std::make_shared<Channel>(epoll, socket->GetFd());
+	channelPtr->SetEvents(EPOLLIN | EPOLLET);
+	channelPtr->EnableReading();
+
+	std::vector<std::shared_ptr<Channel>> channelsToDelete;
 	while (true) {
-		std::vector<epoll_event> activeEvents = epoll.Poll(-1);
-		for (auto& activeEvent : activeEvents) {
-			if (activeEvent.data.fd == socket.GetFd()) {
-				socklen_t addressSize = sizeof(address);
-				Socket connSocket = socket.Accept(address);
-				connSocket.SetNonBlocking();
-				epoll.AddFd(connSocket.GetFd(), EPOLLIN | EPOLLET);
-			} else if (activeEvent.events & EPOLLIN) {
-				HandleInEvent(activeEvent);
+		std::vector<Channel *> activeChannels = epoll->Poll(-1);
+		for (auto& activeChannel : activeChannels) {
+			if (activeChannel->GetFd() == socket->GetFd()) {
+				Socket::ptr connSocket = socket->Accept(address);
+				LOG("new connection from fd[%d], IP[%s:%d]\n", connSocket->GetFd(),
+					inet_ntoa(address->RawSockAddrIn().sin_addr),
+					ntohs(address->RawSockAddrIn().sin_port));
+				connSocket->SetNonBlocking();
+				auto connChannel = std::make_shared<Channel>(epoll, connSocket->GetFd());
+				LOG("connChannel [%d]\n", connChannel->GetFd());
+				channelsToDelete.push_back(connChannel);
+				connChannel->EnableReading();
+			} else if (activeChannel->GetRevents() & EPOLLIN) {
+				LOG("Revents & EPOLLIN match!");
+				HandleInEvent(activeChannel->GetFd());
 			} else {
-				LOG("Somthing else\n");
+				LOG("Something else\n");
 			}
 		}
 	}

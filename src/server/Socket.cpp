@@ -1,6 +1,7 @@
 #include "Socket.h"
 
 #include <fcntl.h>
+#include <arpa/inet.h>
 
 #include "Logger.h"
 #include <sys/socket.h>
@@ -35,14 +36,15 @@ int Socket::SetNonBlocking() {
     return fcntl(m_sockFd, F_SETFL, attr | O_NONBLOCK);
 }
 
-int Socket::Bind(InetAddress& addr) const {
-    sockaddr_in &address = addr.RawSockAddrIn();
+int Socket::Bind(InetAddress::ptr addr) const {
+    sockaddr_in &address = addr->RawSockAddrIn();
     int ret = bind(m_sockFd, reinterpret_cast<sockaddr *>(&address), sizeof(address));
     if (ret < 0) {
         LOG("bind failed");
         return -1;
     }
-    LOG("socket binded on port 8888\n");
+    LOG("socket binded on port %s:%d\n", inet_ntoa(addr->RawSockAddrIn().sin_addr),
+        ntohs(addr->RawSockAddrIn().sin_port));
     return 0;
 }
 
@@ -56,15 +58,15 @@ int Socket::Listen() {
     return 0;
 }
 
-Socket Socket::Accept(InetAddress &addr) {
-    socklen_t addrLen = addr.SockLen();
-    int connFd = accept(m_sockFd, reinterpret_cast<struct sockaddr *>(&addr.RawSockAddrIn()), &addrLen);
+Socket::ptr Socket::Accept(InetAddress::ptr addr) {
+    socklen_t addrLen = addr->SockLen();
+    int connFd = accept(m_sockFd, reinterpret_cast<struct sockaddr *>(addr.get()), &addrLen);
     if (connFd < 0) {
         LOG("accept failed\n");
-        return -1;
+        return nullptr;
     }
-    LOG("accept connection!!\n");
-    return Socket(connFd);
+    LOG("accept connection!! fd[%d]\n", connFd);
+    return std::make_shared<Socket>(connFd);
 }
 
 int Socket::Connect() {

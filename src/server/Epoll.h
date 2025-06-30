@@ -8,15 +8,21 @@
 #include <sys/epoll.h>
 
 #include <vector>
+#include <memory>
 
 constexpr int32_t MAX_EPOLL_EVENTS = 1024;
 
+class Channel;
+
 class Epoll {
 public:
+    typedef std::shared_ptr<Epoll> ptr;
     Epoll();
     ~Epoll();
-    std::vector<epoll_event> Poll(int timeout);
+    std::vector<Channel *> Poll(int timeout);
+    int GetFd() const;
     void AddFd(int fd, int events);
+    void UpdateChannel(Channel* channelPtr);
 
 private:
     int m_epfd;

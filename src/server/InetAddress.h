@@ -5,10 +5,12 @@
 #ifndef INETADDRESS_H
 #define INETADDRESS_H
 
+#include <memory>
 #include <netinet/in.h>
 
 class InetAddress {
 public:
+    typedef std::shared_ptr<InetAddress> ptr;
     explicit InetAddress(const char* addr, unsigned short port = 0);
     sockaddr_in& RawSockAddrIn();
     socklen_t SockLen() const;

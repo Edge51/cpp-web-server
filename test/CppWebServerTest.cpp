@@ -4,10 +4,12 @@
 #include "CppWebServerTest.h"
 #include "Server.h"
 #include "Client.h"
-
+#include <cstdio>
 
 TEST(CppWebServerTest, ServerRun)
 {
+    printf("ServerRun\n");
+    sleep(3);
     std::thread serverThread(ServerRun);
     serverThread.detach();
     sleep(3);

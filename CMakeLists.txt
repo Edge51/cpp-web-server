@@ -11,6 +11,8 @@ add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
         src/server/Epoll.cpp
         src/server/Socket.cpp
         src/server/Define.h
+        src/server/Channel.cpp
+        src/server/Channel.h
 )
 
 target_include_directories(CppWebServer PUBLIC
@@ -37,7 +39,9 @@ add_executable(CppWebServerTest
         src/server/Socket.cpp
         src/server/InetAddress.cpp
         src/server/Server.cpp
-        src/client/Client.cpp)
+        src/client/Client.cpp
+        src/server/Channel.cpp
+        src/server/Channel.h)
 target_link_libraries(CppWebServerTest GTest::gtest_main)
 target_include_directories(CppWebServerTest PRIVATE
     Logger/include

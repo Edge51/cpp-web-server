@@ -4,20 +4,32 @@
 
 #include "Channel.h"
 #include "Epoll.h"
+#include "EventLoop.h"
 #include "Logger.h"
 
-Channel::Channel(const Epoll::ptr& ep, int fd) : m_epoll(ep), m_fd(fd) {
+Channel::Channel(const EventLoop::ptr& eventLoop, int fd)
+    : m_eventLoop(eventLoop), m_fd(fd) {
 }
 
 Channel::~Channel() {
-    LOG("~Channel\n");
-    m_epoll = nullptr;
+    LOG("~Channel, fd[%d]\n", GetFd());
     m_fd = -1;
 }
 
 void Channel::EnableReading() {
+    LOG("AAA");
     m_events = EPOLLIN | EPOLLET;
-    m_epoll->UpdateChannel(this);
+    m_eventLoop->UpdateChannel(std::make_shared<Channel>(*this));
+    LOG("CCC");
+}
+
+void Channel::HandleEvent() {
+    m_handler();
+}
+
+void Channel::SetHandler(std::function<void()> handler) {
+    LOG("Channel::SetHandler\n");
+    m_handler = handler;
 }
 
 int Channel::GetFd() const {

@@ -12,6 +12,7 @@ class InetAddress {
 public:
     typedef std::shared_ptr<InetAddress> ptr;
     explicit InetAddress(const char* addr, unsigned short port = 0);
+    InetAddress();
     sockaddr_in& RawSockAddrIn();
     socklen_t SockLen() const;
 private:

@@ -52,13 +52,13 @@ void Epoll::AddFd(int fd, int events) {
     CHK_PRT(epoll_ctl(m_epfd, EPOLL_CTL_ADD, fd, &ev) == 0, LOG("epoll failed"));
 }
 
-void Epoll::UpdateChannel(Channel *channelPtr) {
+void Epoll::UpdateChannel(std::shared_ptr<Channel> channelPtr) {
     const int fd = channelPtr->GetFd();
     const int events = channelPtr->GetEvents();
 
     epoll_event ev{};
     ev.events = events;
-    ev.data.ptr = channelPtr;
+    ev.data.ptr = channelPtr.get();
 
     if (channelPtr->IsInEpoll()) {
         LOG("epoll_ctl EPOLL_CTL_MOD on ep[%d], fd[%d], events[%d]\n", m_epfd, fd, events);

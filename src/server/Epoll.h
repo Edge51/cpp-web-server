@@ -22,7 +22,7 @@ public:
     std::vector<Channel *> Poll(int timeout);
     int GetFd() const;
     void AddFd(int fd, int events);
-    void UpdateChannel(Channel* channelPtr);
+    void UpdateChannel(std::shared_ptr<Channel> channelPtr);
 
 private:
     int m_epfd;

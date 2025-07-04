@@ -5,18 +5,22 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+#include <functional>
 #include <memory>
 #include <sys/epoll.h>
 
-class Epoll;
+class EventLoop;
 
 class Channel {
 public:
     typedef std::shared_ptr<Channel> ptr;
 
-    Channel(const std::shared_ptr<Epoll>& ep, int fd);
+    Channel(const std::shared_ptr<EventLoop>& ep, int fd);
     ~Channel();
     void EnableReading();
+    void HandleEvent();
+    void SetHandler(std::function<void()> handler);
+
     int GetFd() const;
     void SetEvents(int events);
     int GetEvents() const;
@@ -26,7 +30,8 @@ public:
     bool IsInEpoll() const;
     void SetInEpoll(bool isInEpoll);
 private:
-    std::shared_ptr<Epoll> m_epoll;
+    std::shared_ptr<EventLoop> m_eventLoop;
+    std::function<void()> m_handler;
     int m_fd;
     uint32_t m_events;
     uint32_t m_revents;

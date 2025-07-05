@@ -5,9 +5,12 @@
 #include <memory>
 #include <vector>
 
+#include "Acceptor.h"
+
 class EventLoop;
 class Channel;
 class Socket;
+class Acceptor;
 
 class Server {
 public:
@@ -19,6 +22,7 @@ public:
     int ChannelSize() const { return m_channels.size(); }
 private:
     std::shared_ptr<EventLoop> m_eventLoop;
+    std::shared_ptr<Acceptor> m_acceptor;
     std::vector<std::shared_ptr<Channel>> m_channels;
 };
 

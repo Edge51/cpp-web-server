@@ -13,11 +13,13 @@
 
 #include <arpa/inet.h>
 
+#include "Acceptor.h"
 #include "Channel.h"
 #include "Logger.h"
 #include "Epoll.h"
 #include "EventLoop.h"
 #include "Socket.h"
+#include "Acceptor.h"
 
 #define PORT 8888
 
@@ -25,21 +27,12 @@ constexpr int MAX_EVENTS = 10;
 
 Server::Server(const std::shared_ptr<EventLoop> &eventLoop)
 	: m_eventLoop(eventLoop){
-	auto socket = std::make_shared<Socket>();
-	LOG("Socket created, fd[%d]\n", socket->GetFd());
-	socket->SetOpt(SO_REUSEADDR | SO_REUSEPORT);
-
-	auto address = std::make_shared<InetAddress>("127.0.0.1", 8888);
-	CHK_PRT(socket->Bind(address) == 0, "Bind failed");
-	socket->Listen();
-	socket->SetNonBlocking();
-
-	auto channelPtr = std::make_shared<Channel>(m_eventLoop, socket->GetFd());
-	std::function<void()> newConnection = [this, socket] { HandleNewConnection(socket); };
-	channelPtr->SetHandler(newConnection);
-	channelPtr->SetEvents(EPOLLIN | EPOLLET);
-	m_eventLoop->UpdateChannel(channelPtr);
-	m_channels.push_back(channelPtr);
+	m_acceptor = std::make_shared<Acceptor>(m_eventLoop);
+	std::function<void(std::shared_ptr<Socket>)> acceptHandler = [this](std::shared_ptr<Socket> socket) {
+		HandleNewConnection(socket);
+	};
+	m_acceptor->SetNewConnectionCallback(acceptHandler);
+	m_acceptor->EnableAccept();
 }
 
 void Server::HandleReadEvent(int fd) {

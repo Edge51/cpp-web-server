@@ -17,10 +17,8 @@ Channel::~Channel() {
 }
 
 void Channel::EnableReading() {
-    LOG("AAA");
     m_events = EPOLLIN | EPOLLET;
     m_eventLoop->UpdateChannel(std::make_shared<Channel>(*this));
-    LOG("CCC");
 }
 
 void Channel::HandleEvent() {

@@ -12,6 +12,8 @@ add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
         src/server/Socket.cpp
         src/server/Channel.cpp
         src/server/EventLoop.cpp
+        src/server/Acceptor.cpp
+        src/server/Acceptor.h
 )
 
 target_include_directories(CppWebServer PUBLIC

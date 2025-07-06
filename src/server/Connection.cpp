@@ -15,6 +15,7 @@
 #include "Channel.h"
 #include "EventLoop.h"
 #include "Logger.h"
+#include "Buffer.h"
 
 Connection::Connection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket) {
     m_channel = std::make_shared<Channel>(eventLoop, socket);
@@ -22,30 +23,30 @@ Connection::Connection(const EventLoop::ptr& eventLoop, const Socket::ptr& socke
     m_channel->SetHandler(connectCallback);
     m_channel->SetEvents(EPOLLIN | EPOLLET);
     eventLoop->UpdateChannel(m_channel);
+    m_readBuffer = std::make_shared<Buffer>();
+    m_writeBuffer = std::make_shared<Buffer>();
 }
 
 void Connection::HandleReadEvent(int fd) {
     LOG("HandleInEvent fd[%d]\n", fd);
     char buf[1024] = { 0 };
-    int times = 0;
     while (true) {
         bzero(buf, sizeof(buf));
         int bytesRead = read(fd, buf, sizeof(buf));
         if (bytesRead > 0) {
-            times++;
             LOG("read %d bytes from socket, buf:%s\n", bytesRead, buf);
-
-            char sendBuf[1024] = "Hello from Server!\n";
-            send(fd, sendBuf, strlen(sendBuf), 0);
-            if (times == 3) {
-                LOG("receive end\n");
-                return ;
-            }
+            m_readBuffer->Append(buf, bytesRead);
         } else if (bytesRead == -1 && errno == EINTR) {
             LOG("errno[%d] EINTR, means client interupted, continue recv\n", errno);
             continue;
         } else if (bytesRead == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
             LOG("errno[%d] EAGAIN OR EWOULDBLOCK, means recv finish\n", errno);
+            LOG("readBuffer[%s]\n", m_readBuffer->c_str());
+            char sendBuf[1024] = "Hello from Server!\n";
+            m_writeBuffer->Append(sendBuf, sizeof(sendBuf));
+            send(fd, m_writeBuffer->c_str(), m_writeBuffer->Size(), 0);
+            m_readBuffer->Clear();
+            m_writeBuffer->Clear();
             break;
         } else if (bytesRead == 0) {
             LOG("bytesRead[%d], client disconnected\n", bytesRead);

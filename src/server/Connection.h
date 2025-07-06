@@ -10,6 +10,7 @@
 class Socket;
 class Channel;
 class EventLoop;
+class Buffer;
 
 class Connection {
 public:
@@ -21,6 +22,8 @@ private:
     std::function<void(std::shared_ptr<Socket>)> m_handleReadEventCallback;
     std::function<void(int)> m_deleteConnectionCallback;
     std::shared_ptr<Channel> m_channel;
+    std::shared_ptr<Buffer> m_readBuffer;
+    std::shared_ptr<Buffer> m_writeBuffer;
 };
 
 

@@ -2,18 +2,19 @@
 // Created by liuyu on 6/29/2025.
 //
 
+#include <unistd.h>
+
 #include "Channel.h"
 #include "Epoll.h"
 #include "EventLoop.h"
 #include "Logger.h"
+#include "Socket.h"
 
-Channel::Channel(const EventLoop::ptr& eventLoop, int fd)
-    : m_eventLoop(eventLoop), m_fd(fd) {
+Channel::Channel(const EventLoop::ptr& eventLoop, Socket::ptr socket)
+    : m_eventLoop(eventLoop), m_socket(socket) {
 }
 
 Channel::~Channel() {
-    LOG("~Channel, fd[%d]\n", GetFd());
-    m_fd = -1;
 }
 
 void Channel::EnableReading() {
@@ -31,7 +32,7 @@ void Channel::SetHandler(std::function<void()> handler) {
 }
 
 int Channel::GetFd() const {
-    return m_fd;
+    return m_socket->GetFd();
 }
 
 void Channel::SetEvents(int events) {

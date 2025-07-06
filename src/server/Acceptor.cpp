@@ -3,6 +3,9 @@
 //
 
 #include "Acceptor.h"
+
+#include <arpa/inet.h>
+
 #include "Socket.h"
 #include "Channel.h"
 #include "EventLoop.h"
@@ -18,7 +21,7 @@ Acceptor::Acceptor(EventLoop::ptr eventLoop) : m_eventLoop(eventLoop) {
     m_socket->Listen();
     m_socket->SetNonBlocking();
 
-    m_channel = std::make_shared<Channel>(m_eventLoop, m_socket->GetFd());
+    m_channel = std::make_shared<Channel>(m_eventLoop, m_socket);
 }
 
 Acceptor::~Acceptor() {
@@ -32,7 +35,13 @@ void Acceptor::SetNewConnectionCallback(std::function<void(std::shared_ptr<Socke
 }
 
 void Acceptor::HandleNewConnection() {
-    m_onNewConnection(m_socket);
+    InetAddress::ptr address = std::make_shared<InetAddress>();
+    Socket::ptr connSocket = m_socket->Accept(address);
+    LOG("new connection from fd[%d], IP[%s:%d]\n", connSocket->GetFd(),
+        inet_ntoa(address->RawSockAddrIn().sin_addr),
+        ntohs(address->RawSockAddrIn().sin_port));
+    connSocket->SetNonBlocking();
+    m_onNewConnection(connSocket);
 }
 
 Channel::ptr Acceptor::GetChannel() {

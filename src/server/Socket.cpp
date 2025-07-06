@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #include "Logger.h"
 #include <sys/socket.h>
@@ -14,6 +15,14 @@ Socket::Socket() {
 }
 
 Socket::Socket(int fd) : m_sockFd(fd) {}
+
+Socket::~Socket() {
+    LOG("close socket, fd[%d]", m_sockFd);
+    if (m_sockFd >= 0) {
+        close(m_sockFd);
+        m_sockFd = -1;
+    }
+}
 
 int Socket::GetFd() const {
     return m_sockFd;

@@ -10,6 +10,7 @@ public:
     typedef std::shared_ptr<Socket> ptr;
     Socket();
     Socket(int fd);
+    ~Socket();
     int GetFd() const;
     int SetOpt(int opName);
     int SetNonBlocking();

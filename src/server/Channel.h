@@ -10,12 +10,13 @@
 #include <sys/epoll.h>
 
 class EventLoop;
+class Socket;
 
 class Channel {
 public:
     typedef std::shared_ptr<Channel> ptr;
 
-    Channel(const std::shared_ptr<EventLoop>& ep, int fd);
+    Channel(const std::shared_ptr<EventLoop>& ep, std::shared_ptr<Socket> socket);
     ~Channel();
     void EnableReading();
     void HandleEvent();
@@ -31,8 +32,8 @@ public:
     void SetInEpoll(bool isInEpoll);
 private:
     std::shared_ptr<EventLoop> m_eventLoop;
+    std::shared_ptr<Socket> m_socket;
     std::function<void()> m_handler;
-    int m_fd;
     uint32_t m_events;
     uint32_t m_revents;
     bool m_inEpoll { false };

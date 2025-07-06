@@ -1,9 +1,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/epoll.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -15,11 +13,11 @@
 
 #include "Acceptor.h"
 #include "Channel.h"
+#include "Connection.h"
 #include "Logger.h"
 #include "Epoll.h"
 #include "EventLoop.h"
 #include "Socket.h"
-#include "Acceptor.h"
 
 #define PORT 8888
 
@@ -71,17 +69,15 @@ void Server::HandleWriteEvent() {
 }
 
 void Server::HandleNewConnection(std::shared_ptr<Socket> socket) {
-	InetAddress::ptr address = std::make_shared<InetAddress>();
-	Socket::ptr connSocket = socket->Accept(address);
-	LOG("new connection from fd[%d], IP[%s:%d]\n", connSocket->GetFd(),
-		inet_ntoa(address->RawSockAddrIn().sin_addr),
-		ntohs(address->RawSockAddrIn().sin_port));
-	connSocket->SetNonBlocking();
-	auto connChannel = std::make_shared<Channel>(m_eventLoop, connSocket->GetFd());
-	LOG("connChannel [%d]\n", connChannel->GetFd());
-	std::function<void()> readHandler = [this, capture0 = connChannel->GetFd()] { HandleReadEvent(capture0); };
-	connChannel->SetHandler(readHandler);
-	connChannel->EnableReading();
-	m_channels.push_back(connChannel);
+	Connection::ptr connection = std::make_shared<Connection>(m_eventLoop, socket);
+	std::function<void(int)> deleteHandler = [this](int fd) {
+		DeleteConnection(fd);
+	};
+	connection->SetDeleteConnectionCallBack(deleteHandler);
+	m_connections[socket->GetFd()] = connection;
 }
 
+void Server::DeleteConnection(int fd) {
+	LOG("erase connection [%d]\n", fd);
+	m_connections.erase(fd);
+}

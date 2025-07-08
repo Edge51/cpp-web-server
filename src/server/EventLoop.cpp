@@ -5,9 +5,11 @@
 #include "EventLoop.h"
 #include "Epoll.h"
 #include "Channel.h"
+#include "ThreadPool.h"
 
 EventLoop::EventLoop() {
     m_epoll = std::make_shared<Epoll>();
+    m_threadPool = std::make_shared<ThreadPool>(THREAD_POLL_DEFAULT_SIZE);
 }
 
 void EventLoop::Loop() {
@@ -30,4 +32,8 @@ void EventLoop::Stop() {
 
 void EventLoop::UpdateChannel(std::shared_ptr<Channel> channel) {
     m_epoll->UpdateChannel(channel);
+}
+
+void EventLoop::AddTask(std::function<void()> task) {
+    m_threadPool->AddTask(task);
 }

@@ -28,7 +28,7 @@ Epoll::~Epoll() {
 }
 
 std::vector<Channel *> Epoll::Poll(int timeout) {
-    printf("epoll_wait start\n");
+    printf("epoll_wait start, m_epfd[%d], m_events[%p]\n", m_epfd, &m_epfd);
     int nfds = epoll_wait(m_epfd, m_events, MAX_EPOLL_EVENTS, timeout);
     CHK_PRT(nfds == -1, LOG("Poll failed"));
     std::vector<Channel *> activeChannels;

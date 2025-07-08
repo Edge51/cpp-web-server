@@ -18,6 +18,8 @@ add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
         src/server/Connection.h
         src/server/Buffer.cpp
         src/server/Buffer.h
+        src/server/ThreadPool.cpp
+        src/server/ThreadPool.h
 )
 
 target_include_directories(CppWebServer PUBLIC

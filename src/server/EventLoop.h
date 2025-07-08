@@ -4,19 +4,25 @@
 
 #ifndef EVENTLOOP_H
 #define EVENTLOOP_H
+#include <functional>
+#include <memory>
 
-#include "Epoll.h"
+class Epoll;
+class ThreadPool;
+class Channel;
 
 class EventLoop {
 public:
-    typedef std::shared_ptr<EventLoop> ptr;
+    using ptr = std::shared_ptr<EventLoop>;
     explicit EventLoop();
     void Loop();
     void Start();
     void Stop();
     void UpdateChannel(std::shared_ptr<Channel> channel);
+    void AddTask(std::function<void()> task);
 private:
-    Epoll::ptr m_epoll;
+    std::shared_ptr<Epoll> m_epoll;
+    std::shared_ptr<ThreadPool> m_threadPool;
     bool m_running { false };
 };
 

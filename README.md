@@ -6,6 +6,17 @@ client send message with socketFd instead of connectFd
 
 ### 开发日记
 
+2025-07-08
+近期重新开始接着写cpp server项目，跟着30dayscppwebserver项目写，已经写到了第11天，感觉跟着写要比想象中的简单许多。
+今天增加ThreadPool遇到的问题主要是线程获取任务的时候，判断可以获取任务的条件写错了，应该是如果没有在运行了或者task队列非空，再往下走获取任务，而不是运行中或者队列非空。
+同时，还要端到端仔细推敲，当ThreadPool停止运行之后会执行notify_all，之后所有线程都会来尝试从队列获取任务，此时，需要判断队列如果空，就不能再直接获取任务了，否则拿到空任务，程序就发生异常了。
+
+随后将ThreadPool的AddTask函数改成模板函数，并通过std::future获取返回值。
+学习收获：增加ThreadPool写的时候要仔细审视清楚功能和逻辑，真正弄懂了再动手，而不是囫囵吞枣，照猫画虎。C++11后的新特性std::result_of的语法也不熟悉，需要多写写。
+
+今天觉得，应该白天学习清楚晚上具体要开发什么，等到晚上写的时候，尽量不要参考代码完成实现，这样才是比较好的学习，因为会了应该是可以真正写出来才是会了，而不是参考着写出来。
+做事情慢一步，那么慢一步慢下来，是需要做什么样的思考呢？是否应该在做事情之前，就想清楚，我是想要学到什么东西而去做这个事情。
+
 2024-08-26
 because the concurrent test throws exception, seems like the pop should be change to try pop and wait and pop.
 

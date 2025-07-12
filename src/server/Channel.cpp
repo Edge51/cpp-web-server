@@ -23,7 +23,7 @@ void Channel::EnableReading() {
 }
 
 void Channel::HandleEvent() {
-    m_eventLoop->AddTask(m_handler);
+    m_handler();
 }
 
 void Channel::SetHandler(std::function<void()> handler) {

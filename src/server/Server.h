@@ -6,13 +6,13 @@
 #include <vector>
 #include <map>
 
-#include "Acceptor.h"
 
 class EventLoop;
 class Channel;
 class Socket;
 class Acceptor;
 class Connection;
+class ThreadPool;
 
 class Server {
 public:
@@ -24,9 +24,11 @@ public:
     void DeleteConnection(int fd);
     int ConnectionCount() { return m_connections.size(); }
 private:
-    std::shared_ptr<EventLoop> m_eventLoop;
+    std::shared_ptr<EventLoop> m_mainReactor;
+    std::vector<std::shared_ptr<EventLoop>> m_subReactors;
     std::shared_ptr<Acceptor> m_acceptor;
     std::map<int, std::shared_ptr<Connection>> m_connections;
+    std::shared_ptr<ThreadPool> m_threadPool;
 };
 
 #endif

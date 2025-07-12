@@ -6,31 +6,40 @@
 #include <string.h>
 #include <stdio.h>
 #include <string>
+#include <utility>
 
 #include "Server.h"
 
-#include <arpa/inet.h>
 
 #include "Acceptor.h"
-#include "Channel.h"
 #include "Connection.h"
 #include "Logger.h"
-#include "Epoll.h"
 #include "EventLoop.h"
 #include "Socket.h"
+#include "ThreadPool.h"
 
 #define PORT 8888
 
 constexpr int MAX_EVENTS = 10;
 
 Server::Server(const std::shared_ptr<EventLoop> &eventLoop)
-	: m_eventLoop(eventLoop){
-	m_acceptor = std::make_shared<Acceptor>(m_eventLoop);
+	: m_mainReactor(eventLoop){
+	m_acceptor = std::make_shared<Acceptor>(m_mainReactor);
 	std::function<void(std::shared_ptr<Socket>)> acceptHandler = [this](std::shared_ptr<Socket> socket) {
-		HandleNewConnection(socket);
+		HandleNewConnection(std::move(socket));
 	};
 	m_acceptor->SetNewConnectionCallback(acceptHandler);
 	m_acceptor->EnableAccept();
+
+	auto size = std::thread::hardware_concurrency();
+	m_threadPool = std::make_shared<ThreadPool>(size);
+
+	for (int i = 0; i < size; i++) {
+		m_subReactors.push_back(std::make_shared<EventLoop>());
+	}
+	for (int i = 0; i < size; i++) {
+		m_threadPool->AddTask(std::bind(&EventLoop::Loop, m_subReactors[i]));
+	}
 }
 
 void Server::HandleReadEvent(int fd) {
@@ -69,7 +78,8 @@ void Server::HandleWriteEvent() {
 }
 
 void Server::HandleNewConnection(std::shared_ptr<Socket> socket) {
-	Connection::ptr connection = std::make_shared<Connection>(m_eventLoop, socket);
+	int random = socket->GetFd() % m_subReactors.size();
+	Connection::ptr connection = std::make_shared<Connection>(m_subReactors[random], socket);
 	std::function<void(int)> deleteHandler = [this](int fd) {
 		DeleteConnection(fd);
 	};

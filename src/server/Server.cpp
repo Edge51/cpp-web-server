@@ -80,6 +80,7 @@ void Server::HandleWriteEvent() {
 void Server::HandleNewConnection(std::shared_ptr<Socket> socket) {
 	int random = socket->GetFd() % m_subReactors.size();
 	Connection::ptr connection = std::make_shared<Connection>(m_subReactors[random], socket);
+	connection->SetOnConnectCallback(m_onConnect);
 	std::function<void(int)> deleteHandler = [this](int fd) {
 		DeleteConnection(fd);
 	};
@@ -90,4 +91,8 @@ void Server::HandleNewConnection(std::shared_ptr<Socket> socket) {
 void Server::DeleteConnection(int fd) {
 	LOG("erase connection [%d]\n", fd);
 	m_connections.erase(fd);
+}
+
+void Server::SetOnConnect(std::function<void(std::shared_ptr<Connection>)> callback) {
+	m_onConnect = callback;
 }

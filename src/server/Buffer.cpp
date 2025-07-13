@@ -12,6 +12,10 @@ void Buffer::Append(const char *str, uint32_t len) {
     m_buffer.append(str, len);
 }
 
+void Buffer::SetContent(const std::string &content) {
+    m_buffer = content;
+}
+
 uint32_t Buffer::Size() const {
     return m_buffer.length();
 }

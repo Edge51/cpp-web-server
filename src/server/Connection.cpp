@@ -94,6 +94,7 @@ void Connection::NonBlockRead() {
             return ;
         } else if (bytesRead == 0) {
             LOG("bytesRead[%d], client disconnected\n", bytesRead);
+            m_deleteConnectionCallback(m_channel->GetFd());
             return ;
         }
     }

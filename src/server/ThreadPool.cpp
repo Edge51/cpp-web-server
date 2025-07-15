@@ -4,6 +4,8 @@
 
 #include "ThreadPool.h"
 
+#include "Logger.h"
+
 ThreadPool::ThreadPool(int size) : m_running(true){
     for (int i = 0; i < size; i++) {
         m_workers.emplace_back([this]() {
@@ -20,7 +22,11 @@ ThreadPool::ThreadPool(int size) : m_running(true){
                     task = m_tasks.front();
                     m_tasks.pop();
                 }
-                task();
+                try {
+                    task();
+                } catch (const std::exception& e) {
+                    LOG("task exception: %s", e.what());
+                }
             }
         });
     }

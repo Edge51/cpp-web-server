@@ -13,7 +13,7 @@
 
 Acceptor::Acceptor(EventLoop::ptr eventLoop) : m_eventLoop(eventLoop) {
     m_socket = std::make_shared<Socket>();
-    LOG("Socket created, fd[%d]\n", m_socket->GetFd());
+    LOG("Socket created, fd[%d]", m_socket->GetFd());
     m_socket->SetOpt(SO_REUSEADDR | SO_REUSEPORT);
 
     auto address = std::make_shared<InetAddress>("127.0.0.1", 8888);
@@ -28,7 +28,7 @@ Acceptor::~Acceptor() {
 }
 
 void Acceptor::SetNewConnectionCallback(std::function<void(std::shared_ptr<Socket>)> callback) {
-    LOG("SetNewConnectionCallback\n");
+    LOG("SetNewConnectionCallback");
     m_onNewConnection = callback;
     std::function<void()> newConnection = [this] { HandleNewConnection(); };
     m_channel->SetHandler(newConnection);
@@ -37,7 +37,7 @@ void Acceptor::SetNewConnectionCallback(std::function<void(std::shared_ptr<Socke
 void Acceptor::HandleNewConnection() {
     InetAddress::ptr address = std::make_shared<InetAddress>();
     Socket::ptr connSocket = m_socket->Accept(address);
-    LOG("new connection from fd[%d], IP[%s:%d]\n", connSocket->GetFd(),
+    LOG("new connection from fd[%d], IP[%s:%d]", connSocket->GetFd(),
         inet_ntoa(address->RawSockAddrIn().sin_addr),
         ntohs(address->RawSockAddrIn().sin_port));
     connSocket->SetNonBlocking();
@@ -49,7 +49,7 @@ Channel::ptr Acceptor::GetChannel() {
 }
 
 void Acceptor::EnableAccept() {
-    LOG("EnableAccept\n");
+    LOG("EnableAccept");
     m_channel->SetEvents(EPOLLIN | EPOLLET);
     m_eventLoop->UpdateChannel(m_channel);
 }

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib lib)
 
-add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
+add_executable(CppWebServer src/server/ServerMain.cpp src/server/TcpServer.cpp
         src/server/Logger.cpp
         src/server/InetAddress.cpp
         src/server/Epoll.cpp
@@ -14,12 +14,16 @@ add_executable(CppWebServer src/server/ServerMain.cpp src/server/Server.cpp
         src/server/EventLoop.cpp
         src/server/Acceptor.cpp
         src/server/Acceptor.h
-        src/server/Connection.cpp
-        src/server/Connection.h
+        src/server/TcpConnection.cpp
+        src/server/TcpConnection.h
         src/server/Buffer.cpp
         src/server/Buffer.h
         src/server/ThreadPool.cpp
         src/server/ThreadPool.h
+        src/server/EventLoopThreadPool.cpp
+        src/server/EventLoopThreadPool.h
+        src/server/EventLoopThread.cpp
+        src/server/EventLoopThread.h
 )
 
 target_include_directories(CppWebServer PUBLIC
@@ -45,7 +49,7 @@ add_executable(CppWebServerTest
         src/server/Epoll.cpp
         src/server/Socket.cpp
         src/server/InetAddress.cpp
-        src/server/Server.cpp
+        src/server/TcpServer.cpp
         src/client/Client.cpp
         src/server/Channel.cpp
         src/server/Channel.h

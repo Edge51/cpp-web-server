@@ -8,21 +8,22 @@
 #include <string>
 #include <utility>
 
-#include "Server.h"
+#include "TcpServer.h"
 
 
 #include "Acceptor.h"
-#include "Connection.h"
+#include "TcpConnection.h"
 #include "Logger.h"
 #include "EventLoop.h"
 #include "Socket.h"
 #include "ThreadPool.h"
+#include "EventLoopThreadPool.h"
 
 #define PORT 8888
 
 constexpr int MAX_EVENTS = 10;
 
-Server::Server(const std::shared_ptr<EventLoop> &eventLoop)
+TcpServer::TcpServer(const std::shared_ptr<EventLoop> &eventLoop)
 	: m_mainReactor(eventLoop){
 	m_acceptor = std::make_shared<Acceptor>(m_mainReactor);
 	std::function<void(std::shared_ptr<Socket>)> acceptHandler = [this](std::shared_ptr<Socket> socket) {
@@ -32,17 +33,13 @@ Server::Server(const std::shared_ptr<EventLoop> &eventLoop)
 	m_acceptor->EnableAccept();
 
 	auto size = std::thread::hardware_concurrency();
-	m_threadPool = std::make_shared<ThreadPool>(size);
 
-	for (int i = 0; i < size; i++) {
-		m_subReactors.push_back(std::make_shared<EventLoop>());
-	}
-	for (int i = 0; i < size; i++) {
-		m_threadPool->AddTask(std::bind(&EventLoop::Loop, m_subReactors[i]));
-	}
+	LOG("111");
+	m_eventLoopThreadPool = std::make_shared<EventLoopThreadPool>(size);
+	LOG("112");
 }
 
-void Server::HandleReadEvent(int fd) {
+void TcpServer::HandleReadEvent(int fd) {
 	LOG("HandleInEvent fd[%d]\n", fd);
 	char buf[1024] = { 0 };
 	int times = 0;
@@ -73,13 +70,12 @@ void Server::HandleReadEvent(int fd) {
 	}
 }
 
-void Server::HandleWriteEvent() {
+void TcpServer::HandleWriteEvent() {
 	return ;
 }
 
-void Server::HandleNewConnection(std::shared_ptr<Socket> socket) {
-	int random = socket->GetFd() % m_subReactors.size();
-	Connection::ptr connection = std::make_shared<Connection>(m_subReactors[random], socket);
+void TcpServer::HandleNewConnection(std::shared_ptr<Socket> socket) {
+	TcpConnection::ptr connection = std::make_shared<TcpConnection>(m_eventLoopThreadPool->GetNextLoop(), socket);
 	connection->SetOnConnectCallback(m_onConnect);
 	std::function<void(int)> deleteHandler = [this](int fd) {
 		DeleteConnection(fd);
@@ -88,11 +84,11 @@ void Server::HandleNewConnection(std::shared_ptr<Socket> socket) {
 	m_connections[socket->GetFd()] = connection;
 }
 
-void Server::DeleteConnection(int fd) {
+void TcpServer::DeleteConnection(int fd) {
 	LOG("erase connection [%d]\n", fd);
 	m_connections.erase(fd);
 }
 
-void Server::SetOnConnect(std::function<void(std::shared_ptr<Connection>)> callback) {
+void TcpServer::SetOnConnect(std::function<void(std::shared_ptr<TcpConnection>)> callback) {
 	m_onConnect = callback;
 }

@@ -5,7 +5,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <cstdio>
+#include <stdio.h>
 
 #define LOG(fmt, ...) \
     printf("[%s:%d][%s]" fmt "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)

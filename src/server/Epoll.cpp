@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include <strings.h>
+#include <vector>
 
 #include "Epoll.h"
 
@@ -61,10 +62,10 @@ void Epoll::UpdateChannel(std::shared_ptr<Channel> channelPtr) {
     ev.data.ptr = channelPtr.get();
 
     if (channelPtr->IsInEpoll()) {
-        LOG("epoll_ctl EPOLL_CTL_MOD on ep[%d], fd[%d], events[%d]\n", m_epfd, fd, events);
+        LOG("epoll_ctl EPOLL_CTL_MOD on ep[%d], fd[%d], events[%d]", m_epfd, fd, events);
         CHK_PRT(epoll_ctl(m_epfd, EPOLL_CTL_MOD, fd, &ev) == 0, LOG("epoll modify failed"));
     } else {
-        LOG("epoll_ctl EPOLL_CTL_ADD on ep[%d], fd[%d], events[%d]\n", m_epfd, fd, events);
+        LOG("epoll_ctl EPOLL_CTL_ADD on ep[%d], fd[%d], events[%d]", m_epfd, fd, events);
         CHK_PRT(epoll_ctl(m_epfd, EPOLL_CTL_ADD, fd, &ev) == 0, LOG("epoll add failed"));
         channelPtr->SetInEpoll(true);
     }

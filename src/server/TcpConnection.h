@@ -12,12 +12,12 @@ class Channel;
 class EventLoop;
 class Buffer;
 
-class Connection : public std::enable_shared_from_this<Connection> {
+class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
-    typedef std::shared_ptr<Connection> ptr;
-    Connection(const std::shared_ptr<EventLoop>& eventLoop, const std::shared_ptr<Socket>& socket);
+    typedef std::shared_ptr<TcpConnection> ptr;
+    TcpConnection(const std::shared_ptr<EventLoop>& eventLoop, const std::shared_ptr<Socket>& socket);
     void HandleReadEvent(int fd);
-    void SetOnConnectCallback(const std::function<void(Connection::ptr)>& callback);
+    void SetOnConnectCallback(const std::function<void(TcpConnection::ptr)>& callback);
     void SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback);
 
     void ResetReadBuffer(const std::string &readBuffer);
@@ -31,10 +31,11 @@ public:
 private:
     std::function<void(std::shared_ptr<Socket>)> m_handleReadEventCallback;
     std::function<void(int)> m_deleteConnectionCallback;
+    std::function<void(TcpConnection::ptr)> m_onConnectCallback;
+    
     std::shared_ptr<Channel> m_channel;
     std::shared_ptr<Buffer> m_readBuffer;
     std::shared_ptr<Buffer> m_writeBuffer;
-    std::function<void(Connection::ptr)> m_onConnectCallback;
 };
 
 

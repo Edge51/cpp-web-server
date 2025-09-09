@@ -10,14 +10,14 @@
 #include <cerrno>
 #include <utility>
 
-#include "Connection.h"
+#include "TcpConnection.h"
 #include "Socket.h"
 #include "Channel.h"
 #include "EventLoop.h"
 #include "Logger.h"
 #include "Buffer.h"
 
-Connection::Connection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket) {
+TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket) {
     m_channel = std::make_shared<Channel>(eventLoop, socket);
     m_channel->SetEvents(EPOLLIN | EPOLLET);
     eventLoop->UpdateChannel(m_channel);
@@ -25,7 +25,7 @@ Connection::Connection(const EventLoop::ptr& eventLoop, const Socket::ptr& socke
     m_writeBuffer = std::make_shared<Buffer>();
 }
 
-void Connection::HandleReadEvent(int fd) {
+void TcpConnection::HandleReadEvent(int fd) {
     LOG("HandleInEvent fd[%d]\n", fd);
     char buf[1024] = { 0 };
     while (true) {
@@ -54,32 +54,32 @@ void Connection::HandleReadEvent(int fd) {
     }
 }
 
-void Connection::SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback) {
+void TcpConnection::SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback) {
     m_deleteConnectionCallback = std::move(deleteConnectionCallback);
 }
 
-void Connection::SetOnConnectCallback(const std::function<void(Connection::ptr)>& callback) {
+void TcpConnection::SetOnConnectCallback(const std::function<void(TcpConnection::ptr)>& callback) {
     m_onConnectCallback = callback;
     m_channel->SetHandler([this](){ m_onConnectCallback(shared_from_this());});
 }
 
-void Connection::ResetReadBuffer(const std::string &readBuffer) {
+void TcpConnection::ResetReadBuffer(const std::string &readBuffer) {
     m_readBuffer->Clear();
 }
 
-void Connection::SetWriteBuffer(const std::string &writeBuffer) {
+void TcpConnection::SetWriteBuffer(const std::string &writeBuffer) {
     m_writeBuffer->SetContent(writeBuffer);
 }
 
-std::shared_ptr<Buffer> Connection::GetReadBuffer() {
+std::shared_ptr<Buffer> TcpConnection::GetReadBuffer() {
     return m_readBuffer;
 }
 
-std::shared_ptr<Buffer> Connection::GetWriteBuffer() {
+std::shared_ptr<Buffer> TcpConnection::GetWriteBuffer() {
     return m_writeBuffer;
 }
 
-void Connection::NonBlockRead() {
+void TcpConnection::NonBlockRead() {
     LOG("NonBlockRead\n");
     char buf[1024] = { 0 };
     while (true) {
@@ -100,7 +100,7 @@ void Connection::NonBlockRead() {
     }
 }
 
-void Connection::Write() {
+void TcpConnection::Write() {
     LOG("Writing fd[%d], writeBuffer[%s]", m_channel->GetFd(), m_writeBuffer->c_str());
     int ret = write(m_channel->GetFd(), m_writeBuffer->c_str(), m_writeBuffer->Size());
     CHK_PRT(ret == 0, LOG("write failed, ret[%d], errno[%d]", ret, errno));

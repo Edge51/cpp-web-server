@@ -1,6 +1,6 @@
 #include <unistd.h>
 
-#include "Server.h"
+#include "TcpServer.h"
 #include "EventLoop.h"
 #include "Buffer.h"
 #include "Logger.h"
@@ -8,8 +8,8 @@
 int main(int argc, char* argv[])
 {
     auto eventLoop = std::make_shared<EventLoop>();
-    auto server = std::make_shared<Server>(eventLoop);
-    server->SetOnConnect([](std::shared_ptr<Connection> conn) {
+    auto server = std::make_shared<TcpServer>(eventLoop);
+    server->SetOnConnect([](std::shared_ptr<TcpConnection> conn) {
         conn->NonBlockRead();
         auto readBuffer = conn->GetReadBuffer();
         LOG("Message from client:%s", readBuffer->c_str());

@@ -27,7 +27,7 @@ void Channel::HandleEvent() {
 }
 
 void Channel::SetHandler(std::function<void()> handler) {
-    LOG("Channel::SetHandler\n");
+    LOG("Channel::SetHandler");
     m_handler = handler;
 }
 
@@ -56,6 +56,6 @@ bool Channel::IsInEpoll() const {
 }
 
 void Channel::SetInEpoll(bool isInEpoll) {
-    LOG("inEpoll set to %s\n", isInEpoll ? "true" : "false");
+    LOG("inEpoll set to %s", isInEpoll ? "true" : "false");
     m_inEpoll = isInEpoll;
 }

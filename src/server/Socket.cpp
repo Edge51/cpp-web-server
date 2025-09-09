@@ -52,7 +52,7 @@ int Socket::Bind(InetAddress::ptr addr) const {
         LOG("bind failed");
         return -1;
     }
-    LOG("socket binded on port %s:%d\n", inet_ntoa(addr->RawSockAddrIn().sin_addr),
+    LOG("socket binded on port %s:%d", inet_ntoa(addr->RawSockAddrIn().sin_addr),
         ntohs(addr->RawSockAddrIn().sin_port));
     return 0;
 }
@@ -63,7 +63,7 @@ int Socket::Listen() {
         LOG("listen socketFd failed.\n");
         return 1;
     }
-    LOG("listening on socketFd:%d\n", m_sockFd);
+    LOG("listening on socketFd:%d", m_sockFd);
     return 0;
 }
 

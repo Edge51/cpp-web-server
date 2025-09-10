@@ -24,6 +24,12 @@ add_executable(CppWebServer src/server/ServerMain.cpp src/server/TcpServer.cpp
         src/server/EventLoopThreadPool.h
         src/server/EventLoopThread.cpp
         src/server/EventLoopThread.h
+        src/server/http/HttpRequest.cpp
+        src/server/http/HttpRequest.h
+        src/server/http/HttpParser.cpp
+        src/server/http/HttpParser.h
+        src/server/util/StringUtil.cpp
+        src/server/util/StringUtil.h
 )
 
 target_include_directories(CppWebServer PUBLIC
@@ -44,21 +50,30 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 add_executable(CppWebServerTest
-        test/CppWebServerTest.cpp
-        lib/Logger/src/logger.cpp
-        src/server/Epoll.cpp
-        src/server/Socket.cpp
-        src/server/InetAddress.cpp
-        src/server/TcpServer.cpp
-        src/client/Client.cpp
-        src/server/Channel.cpp
-        src/server/Channel.h
-        src/server/EventLoop.cpp
+#        test/CppWebServerTest.cpp
+#        lib/Logger/src/logger.cpp
+#        src/server/Epoll.cpp
+#        src/server/Socket.cpp
+#        src/server/InetAddress.cpp
+#        src/server/TcpServer.cpp
+#        src/client/Client.cpp
+#        src/server/Channel.cpp
+#        src/server/Channel.h
+#        src/server/EventLoop.cpp
+        src/server/util/StringUtil.cpp
+        src/server/http/HttpParser.cpp
+        src/server/http/HttpParser.h
+        src/server/http/HttpRequest.cpp
+        src/server/http/HttpRequest.h
+        test/HttpRequestTest.cpp
+        test/HttpRequestTest.h
 )
 target_link_libraries(CppWebServerTest GTest::gtest_main)
 target_include_directories(CppWebServerTest PRIVATE
     Logger/include
     src/server
+    src/server/http
+    src/server/util
     src/client
     test)
 

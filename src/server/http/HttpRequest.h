@@ -27,6 +27,7 @@ enum class HttpVersion {
 class HttpRequest {
 public:
     HttpRequest() = default;
+    HttpRequest(const HttpRequest& other) = default;
     HttpVersion GetVersion() const;
     void SetVersion(HttpVersion version);
     HttpMethod GetMethod() const;

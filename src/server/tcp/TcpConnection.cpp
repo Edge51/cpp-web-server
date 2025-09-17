@@ -67,9 +67,9 @@ std::shared_ptr<HttpRequestParser> TcpConnection::GetHttpRequestParser()
     return m_httpRequestParser;
 }
 
-void TcpConnection::SetOnConnectCallback(const std::function<void(TcpConnection::ptr)>& callback) {
-    m_onConnectCallback = callback;
-    m_channel->SetHandler([this](){ m_onConnectCallback(shared_from_this());});
+void TcpConnection::SetOnMessageCallback(const std::function<void(TcpConnection::ptr)>& callback) {
+    m_onMessageCallback = callback;
+    m_channel->SetHandler([this](){ m_onMessageCallback(shared_from_this());});
 }
 
 void TcpConnection::ResetReadBuffer(const std::string &readBuffer) {

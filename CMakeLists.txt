@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib lib)
 
-add_executable(CppWebServer src/server/ServerMain.cpp src/server/tcp/TcpServer.cpp
+add_executable(CppWebServer src/server/EchoServer.cpp src/server/tcp/TcpServer.cpp
         src/server/tcp/Logger.cpp
         src/server/tcp/InetAddress.cpp
         src/server/tcp/Epoll.cpp

@@ -20,7 +20,7 @@ public:
     typedef std::shared_ptr<TcpConnection> ptr;
     TcpConnection(const std::shared_ptr<EventLoop>& eventLoop, const std::shared_ptr<Socket>& socket);
     void HandleReadEvent(int fd);
-    void SetOnConnectCallback(const std::function<void(TcpConnection::ptr)>& callback);
+    void SetOnMessageCallback(const std::function<void(TcpConnection::ptr)>& callback);
     void SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback);
     std::shared_ptr<http::HttpRequestParser> GetHttpRequestParser();
 
@@ -35,7 +35,7 @@ public:
 private:
     std::function<void(std::shared_ptr<Socket>)> m_handleReadEventCallback;
     std::function<void(int)> m_deleteConnectionCallback;
-    std::function<void(TcpConnection::ptr)> m_onConnectCallback;
+    std::function<void(TcpConnection::ptr)> m_onMessageCallback;
     
     std::shared_ptr<Channel> m_channel;
     std::shared_ptr<Buffer> m_readBuffer;

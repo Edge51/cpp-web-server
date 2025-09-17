@@ -20,11 +20,11 @@ class TcpServer {
 public:
     typedef std::shared_ptr<TcpServer> ptr;
     TcpServer(const std::shared_ptr<EventLoop> &eventLoop);
-    void HandleNewConnection(std::shared_ptr<Socket> socket);
+    void OnConnect(std::shared_ptr<Socket> socket);
     void DeleteConnection(int fd);
     int ConnectionCount() { return m_connections.size(); }
 
-    void SetOnConnect(std::function<void(std::shared_ptr<TcpConnection>)> callback);
+    void SetOnMessage(std::function<void(std::shared_ptr<TcpConnection>)> callback);
 private:
     void OnMessage(const TcpConnection::ptr &conn);
     std::shared_ptr<EventLoop> m_mainReactor;
@@ -32,7 +32,7 @@ private:
     std::shared_ptr<Acceptor> m_acceptor;
     std::map<int, std::shared_ptr<TcpConnection>> m_connections;
     std::shared_ptr<EventLoopThreadPool> m_eventLoopThreadPool;
-    std::function<void(std::shared_ptr<TcpConnection>)> m_onConnect;
+    std::function<void(std::shared_ptr<TcpConnection>)> m_onMessage;
 };
 
 #endif

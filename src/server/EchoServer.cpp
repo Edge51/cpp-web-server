@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 {
     auto eventLoop = std::make_shared<EventLoop>();
     auto server = std::make_shared<TcpServer>(eventLoop);
-    server->SetOnConnect([](std::shared_ptr<TcpConnection> conn) {
+    server->SetOnMessage([](std::shared_ptr<TcpConnection> conn) {
         conn->NonBlockRead();
         auto readBuffer = conn->GetReadBuffer();
         LOG("Message from client:%s", readBuffer->c_str());

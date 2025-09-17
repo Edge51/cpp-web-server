@@ -26,9 +26,9 @@ TcpServer::TcpServer(const std::shared_ptr<EventLoop> &eventLoop)
 	: m_mainReactor(eventLoop){
 	m_acceptor = std::make_shared<Acceptor>(m_mainReactor);
 	std::function<void(std::shared_ptr<Socket>)> acceptHandler = [this](std::shared_ptr<Socket> socket) {
-		HandleNewConnection(std::move(socket));
+		OnConnect(std::move(socket));
 	};
-	m_acceptor->SetNewConnectionCallback(acceptHandler);
+	m_acceptor->SetOnConnectCallback(acceptHandler);
 	m_acceptor->EnableAccept();
 
 	auto size = std::thread::hardware_concurrency();
@@ -36,9 +36,9 @@ TcpServer::TcpServer(const std::shared_ptr<EventLoop> &eventLoop)
 	m_eventLoopThreadPool = std::make_shared<EventLoopThreadPool>(size);
 }
 
-void TcpServer::HandleNewConnection(std::shared_ptr<Socket> socket) {
+void TcpServer::OnConnect(std::shared_ptr<Socket> socket) {
 	TcpConnection::ptr connection = std::make_shared<TcpConnection>(m_eventLoopThreadPool->GetNextLoop(), socket);
-	connection->SetOnConnectCallback(m_onConnect);
+	connection->SetOnMessageCallback(m_onMessage);
 	std::function<void(int)> deleteHandler = [this](int fd) {
 		DeleteConnection(fd);
 	};
@@ -51,6 +51,6 @@ void TcpServer::DeleteConnection(int fd) {
 	m_connections.erase(fd);
 }
 
-void TcpServer::SetOnConnect(std::function<void(std::shared_ptr<TcpConnection>)> callback) {
-	m_onConnect = callback;
+void TcpServer::SetOnMessage(std::function<void(std::shared_ptr<TcpConnection>)> callback) {
+	m_onMessage = std::move(callback);
 }

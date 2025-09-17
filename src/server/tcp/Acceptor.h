@@ -19,7 +19,7 @@ public:
 
     void HandleNewConnection();
     void EnableAccept();
-    void SetNewConnectionCallback(std::function<void(std::shared_ptr<Socket>)> callback);
+    void SetOnConnectCallback(std::function<void(std::shared_ptr<Socket>)> callback);
     std::shared_ptr<Channel> GetChannel();
 private:
     std::shared_ptr<Socket> m_socket;

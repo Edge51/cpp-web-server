@@ -14,8 +14,10 @@ public:
     void Start();
 private:
     void OnConnect();
-    void OnPost();
-    void OnGet();
+    void OnMessage();
+    void OnRequest();
+
+private:
 };
 
 } // namespace http

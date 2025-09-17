@@ -27,9 +27,9 @@ Acceptor::Acceptor(EventLoop::ptr eventLoop) : m_eventLoop(eventLoop) {
 Acceptor::~Acceptor() {
 }
 
-void Acceptor::SetNewConnectionCallback(std::function<void(std::shared_ptr<Socket>)> callback) {
+void Acceptor::SetOnConnectCallback(std::function<void(std::shared_ptr<Socket>)> callback) {
     LOG("SetNewConnectionCallback");
-    m_onNewConnection = callback;
+    m_onNewConnection = std::move(callback);
     std::function<void()> newConnection = [this] { HandleNewConnection(); };
     m_channel->SetHandler(newConnection);
 }

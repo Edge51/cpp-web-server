@@ -4,7 +4,6 @@
 
 #include "ThreadPool.h"
 
-#include "Logger.h"
 
 ThreadPool::ThreadPool(int size) : m_running(true){
     for (int i = 0; i < size; i++) {
@@ -25,7 +24,7 @@ ThreadPool::ThreadPool(int size) : m_running(true){
                 try {
                     task();
                 } catch (const std::exception& e) {
-                    LOG("task exception: %s", e.what());
+                    printf("task exception: %s\n", e.what());
                 }
             }
         });

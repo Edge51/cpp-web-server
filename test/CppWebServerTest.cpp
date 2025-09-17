@@ -6,6 +6,26 @@
 #include "Client.h"
 #include <cstdio>
 
+#include "Logger.h"
+#include "EventLoop.h"
+#include "Buffer.h"
+#include "TcpConnection.h"
+
+void ServerRun()
+{
+    auto eventLoop = std::make_shared<EventLoop>();
+    auto server = std::make_shared<TcpServer>(eventLoop);
+    server->SetOnConnect([](std::shared_ptr<TcpConnection> conn) {
+        conn->NonBlockRead();
+        auto readBuffer = conn->GetReadBuffer();
+        LOG("Message from client:%s", readBuffer->c_str());
+        conn->SetWriteBuffer(readBuffer->c_str());
+        conn->Write();
+    });
+
+    eventLoop->Start();
+}
+
 TEST(CppWebServerTest, ServerRun)
 {
     printf("ServerRun\n");
@@ -13,7 +33,7 @@ TEST(CppWebServerTest, ServerRun)
     std::thread serverThread(ServerRun);
     serverThread.detach();
     sleep(3);
-    EXPECT_EQ(ClientRequest(), "Hello from Server!\n");
-    EXPECT_NE(ClientRequest(), "Hello from Server1!\n");
-    EXPECT_EQ(ClientRequest(), "Hello from Server!\n");
+    EXPECT_EQ(ClientRequest(), "hello from client");
+    EXPECT_NE(ClientRequest(), "Hello from Server1!");
+    EXPECT_EQ(ClientRequest(), "hello from client");
 }

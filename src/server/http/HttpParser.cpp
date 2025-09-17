@@ -8,7 +8,7 @@
 #include <algorithm>
 
 #include "Logger.h"
-#include "util/StringUtil.h"
+#include "StringUtil.h"
 
 namespace http {
 

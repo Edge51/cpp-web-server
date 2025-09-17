@@ -16,7 +16,6 @@
 #include "Logger.h"
 #include "EventLoop.h"
 #include "Socket.h"
-#include "ThreadPool.h"
 #include "EventLoopThreadPool.h"
 
 #define PORT 8888
@@ -34,44 +33,7 @@ TcpServer::TcpServer(const std::shared_ptr<EventLoop> &eventLoop)
 
 	auto size = std::thread::hardware_concurrency();
 
-	LOG("111");
 	m_eventLoopThreadPool = std::make_shared<EventLoopThreadPool>(size);
-	LOG("112");
-}
-
-void TcpServer::HandleReadEvent(int fd) {
-	LOG("HandleInEvent fd[%d]\n", fd);
-	char buf[1024] = { 0 };
-	int times = 0;
-	while (true) {
-		bzero(buf, sizeof(buf));
-		int bytesRead = read(fd, buf, sizeof(buf));
-		if (bytesRead > 0) {
-			times++;
-			LOG("read %d bytes from socket, buf:%s\n", bytesRead, buf);
-
-			char sendBuf[1024] = "Hello from Server!\n";
-			send(fd, sendBuf, strlen(sendBuf), 0);
-			if (times == 3) {
-				LOG("receive end\n");
-				return ;
-			}
-		} else if (bytesRead == -1 && errno == EINTR) {
-			LOG("errno[%d] EINTR, means client interupted, continue recv\n", errno);
-			continue;
-		} else if (bytesRead == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-			LOG("errno[%d] EAGAIN OR EWOULDBLOCK, means recv finish\n", errno);
-			break;
-		} else if (bytesRead == 0) {
-			LOG("bytesRead[%d], client disconnected\n", bytesRead);
-			close(fd);
-			break;
-		}
-	}
-}
-
-void TcpServer::HandleWriteEvent() {
-	return ;
 }
 
 void TcpServer::HandleNewConnection(std::shared_ptr<Socket> socket) {

@@ -7,22 +7,9 @@
 #include <string>
 #include <unordered_map>
 
+#include "HttpDefine.h"
+
 namespace http {
-
-enum class HttpMethod {
-    UNDEFINED = 0,
-    GET,
-    POST,
-    PUT,
-    DELETE
-};
-
-enum class HttpVersion {
-    UNDEFINED = 0,
-    HTTP_0_0,
-    HTTP_1_0,
-    HTTP_1_1
-};
 
 class HttpRequest {
 public:

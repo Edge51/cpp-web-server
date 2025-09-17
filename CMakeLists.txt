@@ -5,36 +5,41 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib lib)
 
-add_executable(CppWebServer src/server/ServerMain.cpp src/server/TcpServer.cpp
-        src/server/Logger.cpp
-        src/server/InetAddress.cpp
-        src/server/Epoll.cpp
-        src/server/Socket.cpp
-        src/server/Channel.cpp
-        src/server/EventLoop.cpp
-        src/server/Acceptor.cpp
-        src/server/Acceptor.h
-        src/server/TcpConnection.cpp
-        src/server/TcpConnection.h
-        src/server/Buffer.cpp
-        src/server/Buffer.h
-        src/server/ThreadPool.cpp
-        src/server/ThreadPool.h
-        src/server/EventLoopThreadPool.cpp
-        src/server/EventLoopThreadPool.h
-        src/server/EventLoopThread.cpp
-        src/server/EventLoopThread.h
+add_executable(CppWebServer src/server/ServerMain.cpp src/server/tcp/TcpServer.cpp
+        src/server/tcp/Logger.cpp
+        src/server/tcp/InetAddress.cpp
+        src/server/tcp/Epoll.cpp
+        src/server/tcp/Socket.cpp
+        src/server/tcp/Channel.cpp
+        src/server/tcp/EventLoop.cpp
+        src/server/tcp/Acceptor.cpp
+        src/server/tcp/Acceptor.h
+        src/server/tcp/TcpConnection.cpp
+        src/server/tcp/TcpConnection.h
+        src/server/tcp/Buffer.cpp
+        src/server/tcp/Buffer.h
+        src/server/tcp/EventLoopThreadPool.cpp
+        src/server/tcp/EventLoopThreadPool.h
+        src/server/tcp/EventLoopThread.cpp
+        src/server/tcp/EventLoopThread.h
         src/server/http/HttpRequest.cpp
         src/server/http/HttpRequest.h
         src/server/http/HttpParser.cpp
         src/server/http/HttpParser.h
         src/server/util/StringUtil.cpp
         src/server/util/StringUtil.h
+        src/server/http/HttpResponse.cpp
+        src/server/http/HttpResponse.h
+        src/server/http/HttpDefine.h
+        src/server/http/HttpServer.cpp
+        src/server/http/HttpServer.h
 )
 
 target_include_directories(CppWebServer PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/server)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server/http
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server/util
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server/tcp)
 
 
 include(FetchContent)
@@ -50,28 +55,36 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 add_executable(CppWebServerTest
-#        test/CppWebServerTest.cpp
-#        lib/Logger/src/logger.cpp
-#        src/server/Epoll.cpp
-#        src/server/Socket.cpp
-#        src/server/InetAddress.cpp
-#        src/server/TcpServer.cpp
-#        src/client/Client.cpp
-#        src/server/Channel.cpp
-#        src/server/Channel.h
-#        src/server/EventLoop.cpp
+        test/CppWebServerTest.cpp
+        src/server/tcp/Epoll.cpp
+        src/server/tcp/Socket.cpp
+        src/server/tcp/InetAddress.cpp
+        src/server/tcp/TcpServer.cpp
+        src/server/tcp/TcpConnection.cpp
+        src/server/tcp/Acceptor.cpp
+        src/server/tcp/Buffer.cpp
+        src/server/tcp/EventLoopThreadPool.cpp
+        src/server/tcp/EventLoopThread.cpp
+        src/client/Client.cpp
+        src/server/tcp/Channel.cpp
+        src/server/tcp/Channel.h
+        src/server/tcp/EventLoop.cpp
         src/server/util/StringUtil.cpp
         src/server/http/HttpParser.cpp
         src/server/http/HttpParser.h
         src/server/http/HttpRequest.cpp
         src/server/http/HttpRequest.h
+        src/server/http/HttpResponse.cpp
+        src/server/http/HttpResponse.h
         test/HttpRequestTest.cpp
         test/HttpRequestTest.h
+        test/HttpResponseTest.cpp
+        test/HttpResponseTest.h
 )
 target_link_libraries(CppWebServerTest GTest::gtest_main)
 target_include_directories(CppWebServerTest PRIVATE
     Logger/include
-    src/server
+    src/server/tcp
     src/server/http
     src/server/util
     src/client

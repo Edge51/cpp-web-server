@@ -1,11 +1,10 @@
-#include "Socket.h"
-
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
 #include "Logger.h"
-#include <sys/socket.h>
+#include "Socket.h"
 
 Socket::Socket() {
     m_sockFd = socket(AF_INET, SOCK_STREAM, 0);

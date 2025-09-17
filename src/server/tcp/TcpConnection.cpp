@@ -16,6 +16,9 @@
 #include "EventLoop.h"
 #include "Logger.h"
 #include "Buffer.h"
+#include "../http/HttpParser.h"
+
+using namespace http;
 
 TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket) {
     m_channel = std::make_shared<Channel>(eventLoop, socket);
@@ -23,6 +26,7 @@ TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr&
     eventLoop->UpdateChannel(m_channel);
     m_readBuffer = std::make_shared<Buffer>();
     m_writeBuffer = std::make_shared<Buffer>();
+    m_httpRequestParser = std::make_shared<HttpRequestParser>();
 }
 
 void TcpConnection::HandleReadEvent(int fd) {
@@ -56,6 +60,11 @@ void TcpConnection::HandleReadEvent(int fd) {
 
 void TcpConnection::SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback) {
     m_deleteConnectionCallback = std::move(deleteConnectionCallback);
+}
+
+std::shared_ptr<HttpRequestParser> TcpConnection::GetHttpRequestParser()
+{
+    return m_httpRequestParser;
 }
 
 void TcpConnection::SetOnConnectCallback(const std::function<void(TcpConnection::ptr)>& callback) {

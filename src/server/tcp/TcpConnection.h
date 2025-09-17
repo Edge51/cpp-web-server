@@ -11,6 +11,9 @@ class Socket;
 class Channel;
 class EventLoop;
 class Buffer;
+namespace http {
+class HttpRequestParser;
+} // namespace http
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
@@ -19,6 +22,7 @@ public:
     void HandleReadEvent(int fd);
     void SetOnConnectCallback(const std::function<void(TcpConnection::ptr)>& callback);
     void SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback);
+    std::shared_ptr<http::HttpRequestParser> GetHttpRequestParser();
 
     void ResetReadBuffer(const std::string &readBuffer);
     void SetWriteBuffer(const std::string &writeBuffer);
@@ -36,6 +40,7 @@ private:
     std::shared_ptr<Channel> m_channel;
     std::shared_ptr<Buffer> m_readBuffer;
     std::shared_ptr<Buffer> m_writeBuffer;
+    std::shared_ptr<http::HttpRequestParser> m_httpRequestParser;
 };
 
 

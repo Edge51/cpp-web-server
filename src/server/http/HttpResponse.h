@@ -4,6 +4,7 @@
 
 #ifndef CPPWEBSERVER_HTTPRESPONSE_H
 #define CPPWEBSERVER_HTTPRESPONSE_H
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -13,6 +14,7 @@ namespace http {
 
 class HttpResponse {
 public:
+    using ptr = std::shared_ptr<HttpResponse>;
     HttpResponse() = default;
     void SetContentType(const std::string& contentType);
     void SetHttpVersion(HttpVersion version);

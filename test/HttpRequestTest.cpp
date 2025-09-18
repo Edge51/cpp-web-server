@@ -5,7 +5,7 @@
 #include "HttpRequestTest.h"
 #include "HttpRequest.h"
 #define private public
-#include "HttpParser.h"
+#include "HttpRequestParser.h"
 #undef private
 
 using namespace http;

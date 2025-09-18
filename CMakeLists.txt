@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib lib)
 
-add_executable(CppWebServer src/server/EchoServer.cpp src/server/tcp/TcpServer.cpp
+add_executable(CppWebServer
+#        src/server/EchoServer.cpp
+        src/server/tcp/TcpServer.cpp
         src/server/tcp/Logger.cpp
         src/server/tcp/InetAddress.cpp
         src/server/tcp/Epoll.cpp
@@ -24,8 +26,8 @@ add_executable(CppWebServer src/server/EchoServer.cpp src/server/tcp/TcpServer.c
         src/server/tcp/EventLoopThread.h
         src/server/http/HttpRequest.cpp
         src/server/http/HttpRequest.h
-        src/server/http/HttpParser.cpp
-        src/server/http/HttpParser.h
+        src/server/http/HttpRequestParser.cpp
+        src/server/http/HttpRequestParser.h
         src/server/util/StringUtil.cpp
         src/server/util/StringUtil.h
         src/server/http/HttpResponse.cpp
@@ -33,6 +35,7 @@ add_executable(CppWebServer src/server/EchoServer.cpp src/server/tcp/TcpServer.c
         src/server/http/HttpDefine.h
         src/server/http/HttpServer.cpp
         src/server/http/HttpServer.h
+        src/server/HttpServerMain.cpp
 )
 
 target_include_directories(CppWebServer PUBLIC
@@ -70,8 +73,8 @@ add_executable(CppWebServerTest
         src/server/tcp/Channel.h
         src/server/tcp/EventLoop.cpp
         src/server/util/StringUtil.cpp
-        src/server/http/HttpParser.cpp
-        src/server/http/HttpParser.h
+        src/server/http/HttpRequestParser.cpp
+        src/server/http/HttpRequestParser.h
         src/server/http/HttpRequest.cpp
         src/server/http/HttpRequest.h
         src/server/http/HttpResponse.cpp

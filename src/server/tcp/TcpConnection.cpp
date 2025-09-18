@@ -16,7 +16,7 @@
 #include "EventLoop.h"
 #include "Logger.h"
 #include "Buffer.h"
-#include "../http/HttpParser.h"
+#include "../http/HttpRequestParser.h"
 
 using namespace http;
 
@@ -27,6 +27,12 @@ TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr&
     m_readBuffer = std::make_shared<Buffer>();
     m_writeBuffer = std::make_shared<Buffer>();
     m_httpRequestParser = std::make_shared<HttpRequestParser>();
+    LOG("TcpConnection::ctor, fd[%d]", m_channel->GetFd());
+}
+
+TcpConnection::~TcpConnection()
+{
+    LOG("tcp connection destroy, fd[%d]", m_channel->GetFd());
 }
 
 void TcpConnection::HandleReadEvent(int fd) {

@@ -11,7 +11,7 @@
 #include "Buffer.h"
 #include "TcpConnection.h"
 
-void ServerRun()
+void TcpServerRun()
 {
     auto eventLoop = std::make_shared<EventLoop>();
     auto server = std::make_shared<TcpServer>(eventLoop);
@@ -30,7 +30,7 @@ TEST(CppWebServerTest, ServerRun)
 {
     printf("ServerRun\n");
     sleep(3);
-    std::thread serverThread(ServerRun);
+    std::thread serverThread(TcpServerRun);
     serverThread.detach();
     sleep(3);
     EXPECT_EQ(ClientRequest(), "hello from client");

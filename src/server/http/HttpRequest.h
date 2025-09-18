@@ -4,6 +4,7 @@
 
 #ifndef CPPWEBSERVER_HTTPREQUEST_H
 #define CPPWEBSERVER_HTTPREQUEST_H
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -13,6 +14,7 @@ namespace http {
 
 class HttpRequest {
 public:
+    using ptr = std::unique_ptr<HttpRequest>;
     HttpRequest() = default;
     HttpRequest(const HttpRequest& other) = default;
     HttpVersion GetVersion() const;
@@ -23,6 +25,7 @@ public:
     void SetUrl(const std::string &url);
     std::unordered_map<std::string, std::string> GetHeaders() const;
     void SetHeaders(const std::unordered_map<std::string, std::string> &headers);
+    std::string GetHeader(std::string key) const;
     std::string GetQuery() const;
     void SetQuery(const std::string &query);
     std::string GetBody() const;

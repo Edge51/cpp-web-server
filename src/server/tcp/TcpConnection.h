@@ -19,6 +19,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
     typedef std::shared_ptr<TcpConnection> ptr;
     TcpConnection(const std::shared_ptr<EventLoop>& eventLoop, const std::shared_ptr<Socket>& socket);
+    ~TcpConnection();
     void HandleReadEvent(int fd);
     void SetOnMessageCallback(const std::function<void(TcpConnection::ptr)>& callback);
     void SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback);

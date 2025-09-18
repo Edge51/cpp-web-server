@@ -47,6 +47,14 @@ void HttpRequest::SetHeaders(const std::unordered_map<std::string, std::string> 
     m_headers = headers;
 }
 
+std::string HttpRequest::GetHeader(std::string key) const
+{
+    if (m_headers.find(key) == m_headers.end()) {
+        return "";
+    }
+    return m_headers.find(key)->second;
+}
+
 std::string HttpRequest::GetQuery() const
 {
     return m_query;

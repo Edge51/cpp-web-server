@@ -20,7 +20,9 @@
 
 using namespace http;
 
-TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket) {
+TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket)
+    :m_timeStamp(TimeStamp::Now())
+{
     m_socket = socket;
     m_channel = std::make_shared<Channel>(eventLoop, socket->GetFd());
     m_channel->SetEvents(EPOLLIN | EPOLLET);
@@ -28,6 +30,7 @@ TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr&
     m_readBuffer = std::make_shared<Buffer>();
     m_writeBuffer = std::make_shared<Buffer>();
     m_httpRequestParser = std::make_shared<HttpRequestParser>();
+    m_state = State::CONNECTED;
     LOG("TcpConnection::ctor, fd[%d]", m_channel->GetFd());
 }
 
@@ -65,6 +68,16 @@ void TcpConnection::HandleReadEvent(int fd) {
     }
 }
 
+void TcpConnection::HandleCloseEvent()
+{
+    if (m_state != State::DISCONNECTED) {
+        m_state = State::DISCONNECTED;
+        if (m_deleteConnectionCallback) {
+            m_deleteConnectionCallback(m_channel->GetFd());
+        }
+    }
+}
+
 void TcpConnection::SetDeleteConnectionCallBack(std::function<void(int)> deleteConnectionCallback) {
     m_deleteConnectionCallback = std::move(deleteConnectionCallback);
 }
@@ -72,6 +85,16 @@ void TcpConnection::SetDeleteConnectionCallBack(std::function<void(int)> deleteC
 std::shared_ptr<HttpRequestParser> TcpConnection::GetHttpRequestParser()
 {
     return m_httpRequestParser;
+}
+
+TimeStamp TcpConnection::GetTimeStamp()
+{
+    return m_timeStamp;
+}
+
+void TcpConnection::UpdateTimeStamp(const TimeStamp& timestamp)
+{
+    m_timeStamp = timestamp;
 }
 
 void TcpConnection::SetOnMessageCallback(const std::function<void(TcpConnection::ptr)>& callback) {

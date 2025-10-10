@@ -5,13 +5,17 @@
 #include "HttpServer.h"
 
 #include "Buffer.h"
+#include "EventLoop.h"
 #include "HttpRequestParser.h"
 #include "HttpResponse.h"
 #include "Logger.h"
 #include "TcpConnection.h"
 
 namespace http {
-    HttpServer::HttpServer(std::shared_ptr<EventLoop> loop) : m_tcpServer(std::make_shared<TcpServer>(loop))
+    HttpServer::HttpServer(std::shared_ptr<EventLoop> loop, bool autoCloseFlag)
+        : m_tcpServer(std::make_shared<TcpServer>(loop)),
+        m_mainReactor(loop),
+        m_autoCloseFlag(autoCloseFlag)
     {
         m_tcpServer->SetOnMessage([this](TcpConnection::ptr tcpConnection) {
             OnMessage(tcpConnection);
@@ -24,9 +28,14 @@ namespace http {
         m_response_callback = func;
     }
 
-    void HttpServer::OnConnect(TcpConnection::ptr tcpConnection)
+    void HttpServer::OnConnect(const TcpConnection::ptr& tcpConnection)
     {
         LOG("New connection!");
+        if (m_autoCloseFlag) {
+            m_mainReactor->RunAfter(AUTO_CLOSE_TIMEOUT, [this, tcpConnection]() {
+                AutoCloseTimeoutConnection(tcpConnection);
+            });
+        }
     }
 
     void HttpServer::OnMessage(TcpConnection::ptr tcpConnection)
@@ -62,5 +71,19 @@ namespace http {
         m_response_callback(std::make_shared<HttpRequest>(request), response);
         tcpConnection->SetWriteBuffer(response->PlainText());
         tcpConnection->Write();
+    }
+
+    void HttpServer::AutoCloseTimeoutConnection(std::weak_ptr<TcpConnection> tcpConnection)
+    {
+        TcpConnection::ptr conn = tcpConnection.lock();
+        if (conn) {
+            if (TimeStamp::AddMicroSeconds(conn->GetTimeStamp(), AUTO_CLOSE_TIMEOUT) < TimeStamp::Now()) {
+                conn->HandleCloseEvent();
+            } else {
+                m_mainReactor->RunAfter(AUTO_CLOSE_TIMEOUT, [this, tcpConnection] {
+                    AutoCloseTimeoutConnection(tcpConnection);
+                });
+            }
+        }
     }
 } // namespace http

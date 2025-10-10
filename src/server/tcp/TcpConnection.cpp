@@ -21,7 +21,8 @@
 using namespace http;
 
 TcpConnection::TcpConnection(const EventLoop::ptr& eventLoop, const Socket::ptr& socket) {
-    m_channel = std::make_shared<Channel>(eventLoop, socket);
+    m_socket = socket;
+    m_channel = std::make_shared<Channel>(eventLoop, socket->GetFd());
     m_channel->SetEvents(EPOLLIN | EPOLLET);
     eventLoop->UpdateChannel(m_channel);
     m_readBuffer = std::make_shared<Buffer>();
@@ -76,6 +77,7 @@ std::shared_ptr<HttpRequestParser> TcpConnection::GetHttpRequestParser()
 void TcpConnection::SetOnMessageCallback(const std::function<void(TcpConnection::ptr)>& callback) {
     m_onMessageCallback = callback;
     m_channel->SetHandler([this](){ m_onMessageCallback(shared_from_this());});
+    LOG("SetOnMessageCallback end, fd[%d]", m_channel->GetFd());
 }
 
 void TcpConnection::ResetReadBuffer(const std::string &readBuffer) {

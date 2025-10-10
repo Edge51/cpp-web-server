@@ -36,6 +36,11 @@ TcpServer::TcpServer(const std::shared_ptr<EventLoop> &eventLoop)
 	m_eventLoopThreadPool = std::make_shared<EventLoopThreadPool>(size);
 }
 
+TcpServer::~TcpServer()
+{
+	LOG("TcpServer::~TcpServer");
+}
+
 void TcpServer::OnConnect(std::shared_ptr<Socket> socket) {
 	TcpConnection::ptr connection = std::make_shared<TcpConnection>(m_eventLoopThreadPool->GetNextLoop(), socket);
 	connection->SetOnMessageCallback(m_onMessage);
@@ -44,6 +49,7 @@ void TcpServer::OnConnect(std::shared_ptr<Socket> socket) {
 	};
 	connection->SetDeleteConnectionCallBack(deleteHandler);
 	m_connections[socket->GetFd()] = connection;
+	LOG("TcpServer::OnConnect");
 }
 
 void TcpServer::DeleteConnection(int fd) {

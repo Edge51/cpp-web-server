@@ -21,7 +21,7 @@ Acceptor::Acceptor(EventLoop::ptr eventLoop) : m_eventLoop(eventLoop) {
     m_socket->Listen();
     m_socket->SetNonBlocking();
 
-    m_channel = std::make_shared<Channel>(m_eventLoop, m_socket);
+    m_channel = std::make_shared<Channel>(m_eventLoop, m_socket->GetFd());
 }
 
 Acceptor::~Acceptor() {
@@ -42,6 +42,7 @@ void Acceptor::HandleNewConnection() {
         ntohs(address->RawSockAddrIn().sin_port));
     connSocket->SetNonBlocking();
     m_onNewConnection(connSocket);
+    LOG("Acceptor::HandlerNewConnection");
 }
 
 Channel::ptr Acceptor::GetChannel() {

@@ -10,8 +10,8 @@
 #include "Logger.h"
 #include "Socket.h"
 
-Channel::Channel(const EventLoop::ptr& eventLoop, Socket::ptr socket)
-    : m_eventLoop(eventLoop), m_socket(socket) {
+Channel::Channel(const EventLoop::ptr& eventLoop, int fd)
+    : m_eventLoop(eventLoop), m_fd(fd) {
 }
 
 Channel::~Channel() {
@@ -32,7 +32,7 @@ void Channel::SetHandler(std::function<void()> handler) {
 }
 
 int Channel::GetFd() const {
-    return m_socket->GetFd();
+    return m_fd;
 }
 
 void Channel::SetEvents(int events) {

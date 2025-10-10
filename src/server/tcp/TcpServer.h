@@ -20,6 +20,7 @@ class TcpServer {
 public:
     typedef std::shared_ptr<TcpServer> ptr;
     TcpServer(const std::shared_ptr<EventLoop> &eventLoop);
+    ~TcpServer();
     void OnConnect(std::shared_ptr<Socket> socket);
     void DeleteConnection(int fd);
     int ConnectionCount() { return m_connections.size(); }

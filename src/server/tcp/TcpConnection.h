@@ -39,6 +39,7 @@ private:
     std::function<void(TcpConnection::ptr)> m_onMessageCallback;
     
     std::shared_ptr<Channel> m_channel;
+    std::shared_ptr<Socket> m_socket;
     std::shared_ptr<Buffer> m_readBuffer;
     std::shared_ptr<Buffer> m_writeBuffer;
     std::shared_ptr<http::HttpRequestParser> m_httpRequestParser;

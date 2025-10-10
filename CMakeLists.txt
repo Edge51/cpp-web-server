@@ -36,6 +36,12 @@ add_executable(CppWebServer
         src/server/http/HttpServer.cpp
         src/server/http/HttpServer.h
         src/server/HttpServerMain.cpp
+        src/server/util/timer/TimeStamp.cpp
+        src/server/util/timer/TimeStamp.h
+        src/server/util/timer/Timer.cpp
+        src/server/util/timer/Timer.h
+        src/server/util/timer/TimerQueue.cpp
+        src/server/util/timer/TimerQueue.h
 )
 
 target_include_directories(CppWebServer PUBLIC

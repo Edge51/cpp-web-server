@@ -6,6 +6,13 @@ client send message with socketFd instead of connectFd
 
 ### 开发日记
 
+#### 日志模块需求分析
+
+2025-10-20
+用来记录日志，包括debug,info,warning,error，fatal等级别,支持多线程异步日志，保证高并发场景不影响性能。
+最好还可以实现同时可以对接控制台和文件等输出
+另外日志的大小和归档控制
+
 2025-07-08
 近期重新开始接着写cpp server项目，跟着30dayscppwebserver项目写，已经写到了第11天，感觉跟着写要比想象中的简单许多。
 今天增加ThreadPool遇到的问题主要是线程获取任务的时候，判断可以获取任务的条件写错了，应该是如果没有在运行了或者task队列非空，再往下走获取任务，而不是运行中或者队列非空。

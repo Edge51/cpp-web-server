@@ -9,9 +9,7 @@ class DisableCopy {
 public:
     DisableCopy() = default;
     DisableCopy(const DisableCopy&) = delete;
-    DisableCopy(const DisableCopy&&) = delete;
     DisableCopy& operator=(const DisableCopy& other) = delete;
-    DisableCopy& operator=(const DisableCopy&& other) = delete;
 };
 
 #endif //CPPWEBSERVER_DISABLECOPY_H

@@ -7,6 +7,9 @@
 #include <string>
 
 #include "logger.h"
+#include "../src/FixedBuffer.h"
+
+using namespace ELogger;
 
 TEST(LoggerTest, simpleLog)
 {
@@ -19,4 +22,18 @@ TEST(LoggerTest, simpleLog)
     std::string content = ss.str();
     GTEST_LOG_(INFO) << "content:" << content;
     EXPECT_NE(content.find("hello"), std::string::npos);
+}
+
+TEST(LoggerTest, FixedBuffer)
+{
+    FixedBuffer fb;
+    fb.Append("hello");
+    fb.Append(" world");
+    EXPECT_STREQ(fb.Data(), "hello world");
+    EXPECT_STRNE(fb.Data(), "helloworld");
+    EXPECT_EQ(fb.AvailSize(), BUFFER_SIZE - 11);
+    EXPECT_EQ(fb.UsedSize(), 11);
+    fb.Reset();
+    EXPECT_EQ(fb.UsedSize(), 0);
+    EXPECT_EQ(fb.AvailSize(), BUFFER_SIZE);
 }

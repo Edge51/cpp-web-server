@@ -13,6 +13,8 @@
 
 #include "DisableCopy.h"
 
+namespace ELogger {
+
 enum class LogLevel {
     DEBUG,
     INFO,
@@ -44,5 +46,7 @@ private:
 #define LOG_WARN(message) Logger::GetInstance().Log(LogLevel::WARNING, message, __FILE__, __LINE__)
 #define LOG_FATAL(message) Logger::GetInstance().Log(LogLevel::FATAL, message, __FILE__, __LINE__)
 
+
+} // namespace Logger
 
 #endif

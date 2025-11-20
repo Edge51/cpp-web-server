@@ -3,6 +3,8 @@
 
 #include "logger.h"
 
+namespace ELogger {
+
 Logger & Logger::GetInstance()
 {
     static Logger logger;
@@ -47,3 +49,5 @@ void Logger::Log(LogLevel level, const std::string &message, const std::string &
         logFile << message << std::endl;
     }
 }
+
+} // namespace ELogger

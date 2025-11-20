@@ -8,6 +8,7 @@
 
 #include "logger.h"
 
+namespace ELogger {
 
 class LogFormatter {
 public:
@@ -17,5 +18,6 @@ public:
     virtual ~LogFormatter() = default;
 };
 
+} // namespace Logger
 
 #endif //CPPWEBSERVER_LOGFORMATTER_H

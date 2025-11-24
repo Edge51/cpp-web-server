@@ -49,6 +49,11 @@ uint32_t FixedBuffer::UsedSize() const
     return static_cast<uint32_t>(curr_ - data_);
 }
 
+bool FixedBuffer::Empty() const
+{
+    return curr_ == data_;
+}
+
 void FixedBuffer::Flush()
 {
     // TODO

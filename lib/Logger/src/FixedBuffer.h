@@ -22,6 +22,7 @@ public:
     uint32_t Append(const std::string& data);
     uint32_t AvailSize() const;
     uint32_t UsedSize() const;
+    bool Empty() const;
     void Flush();
     void Reset();
     const char *const Data() const;

@@ -10,6 +10,8 @@ add_library(Logger SHARED
         src/LogFormatter.cpp
         src/LogFormatter.h
         test/LoggerTest.cpp
+        src/DoubleBuffer.cpp
+        src/DoubleBuffer.h
 )
 
 target_sources(Logger PUBLIC
@@ -25,6 +27,8 @@ target_sources(LoggerTest PRIVATE
         test/LoggerTest.cpp
         src/FixedBuffer.cpp
         src/FixedBuffer.h
+        src/DoubleBuffer.cpp
+        src/DoubleBuffer.h
 )
 target_include_directories(LoggerTest PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 
+#include "../src/DoubleBuffer.h"
 #include "logger.h"
 #include "../src/FixedBuffer.h"
 
@@ -36,4 +37,18 @@ TEST(LoggerTest, FixedBuffer)
     fb.Reset();
     EXPECT_EQ(fb.UsedSize(), 0);
     EXPECT_EQ(fb.AvailSize(), BUFFER_SIZE);
+}
+
+TEST(LoggerTest, DoubleBuffer)
+{
+    DoubleBuffer db;
+    std::string output;
+    db.SetFlushCallback([&output](const char* data, uint32_t length) {
+        output.append(data, length);
+    });
+    db.Append("hello");
+    db.Append(" world");
+    db.Flush();
+    db.Stop();
+    EXPECT_STREQ(output.data(), "hello world");
 }

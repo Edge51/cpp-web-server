@@ -36,3 +36,4 @@ build/
 .idea/
 src/client/client
 cmake-build-relwithdebinfo
+third_party/

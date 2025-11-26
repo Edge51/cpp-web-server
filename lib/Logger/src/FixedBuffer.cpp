@@ -5,6 +5,8 @@
 #include "FixedBuffer.h"
 
 #include <cstring>
+#include <iostream>
+#include <ostream>
 
 namespace ELogger {
 
@@ -54,14 +56,11 @@ bool FixedBuffer::Empty() const
     return curr_ == data_;
 }
 
-void FixedBuffer::Flush()
-{
-    // TODO
-}
 
 void FixedBuffer::Reset()
 {
     curr_ = data_;
+    data_[0] = '\0';
 }
 
 const char * const FixedBuffer::Data() const

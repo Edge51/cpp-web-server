@@ -47,7 +47,6 @@ uint32_t ELogger::DoubleBuffer::Append(const std::string &data)
 void ELogger::DoubleBuffer::SwapBuffer()
 {
     if (currBuffer_->Empty()) {
-        std::cout << "currBuffer_->Empty()" << std::endl;
         return ;
     }
     fullBuffers_.emplace_back(std::move(currBuffer_));
@@ -102,8 +101,10 @@ void ELogger::DoubleBuffer::FlushThreadFunc()
             flushCallback_(buffer->Data(), buffer->UsedSize());
         }
     }
+    fullBuffers_.clear();
     if (!currBuffer_->Empty() && flushCallback_) {
         flushCallback_(currBuffer_->Data(), currBuffer_->UsedSize());
     }
+    currBuffer_->Reset();
     cv_.notify_one();
 }

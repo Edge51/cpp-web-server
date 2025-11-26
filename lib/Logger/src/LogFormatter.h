@@ -17,6 +17,10 @@ public:
         const std::string& fileName, int lineNumber) = 0;
     virtual ~LogFormatter() = default;
 };
+class SimpleLogFormatter : public LogFormatter {
+public:
+    std::string Format(LogLevel level, const std::string& message, const std::string& fileName, int lineNumber);
+};
 
 } // namespace Logger
 

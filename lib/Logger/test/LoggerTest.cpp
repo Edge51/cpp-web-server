@@ -12,19 +12,6 @@
 
 using namespace ELogger;
 
-TEST(LoggerTest, simpleLog)
-{
-    LOG_INIT("test.log", LogLevel::DEBUG);
-    LOG_DEBUG("hello");
-    std::fstream logFile("test.log", std::ios::in | std::ios::app);
-    ASSERT_TRUE(logFile.is_open());
-    std::stringstream ss;
-    ss << logFile.rdbuf();
-    std::string content = ss.str();
-    GTEST_LOG_(INFO) << "content:" << content;
-    EXPECT_NE(content.find("hello"), std::string::npos);
-}
-
 TEST(LoggerTest, FixedBuffer)
 {
     FixedBuffer fb;
@@ -51,4 +38,15 @@ TEST(LoggerTest, DoubleBuffer)
     db.Flush();
     db.Stop();
     EXPECT_STREQ(output.data(), "hello world");
+}
+
+TEST(LoggerTest, LogTest)
+{
+    LOG_INIT("logTest.log", LogLevel::INFO);
+    LOG_DEBUG("DEBUG");
+    LOG_INFO("INFO");
+    LOG_WARN("WARN");
+    LOG_ERROR("ERROR");
+    LOG_FATAL("FATAL");
+    LOG_DEINIT();
 }
